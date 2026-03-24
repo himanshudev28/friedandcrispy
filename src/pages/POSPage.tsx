@@ -76,6 +76,85 @@ const POSPage = () => {
     onError: () => toast.error("Failed to save sale"),
   });
 
+  const generateBillHTML = () => {
+    const now = new Date();
+    const billNo = `A${Math.floor(1000 + Math.random() * 9000)}`;
+    const date = now.toLocaleDateString("en-GB");
+    const time = now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+    const totalQty = cart.reduce((sum, c) => sum + c.quantity, 0);
+    const dash = "- ".repeat(35);
+
+    const itemRows = cart.map((item, i) =>
+      `<tr>
+        <td style="padding:2px 4px">${i + 1}</td>
+        <td style="padding:2px 4px">${item.name}</td>
+        <td style="padding:2px 4px;text-align:center">${item.quantity}</td>
+        <td style="padding:2px 4px;text-align:right">${item.price.toFixed(2)}</td>
+        <td style="padding:2px 4px;text-align:right">${(item.price * item.quantity).toFixed(2)}</td>
+      </tr>`
+    ).join("");
+
+    return `<!DOCTYPE html>
+<html><head><style>
+  @page { size: 80mm auto; margin: 5mm; }
+  body { font-family: 'Courier New', Courier, monospace; font-size: 12px; color: #000; margin: 0; padding: 15px; max-width: 350px; margin: 0 auto; }
+  .center { text-align: center; }
+  .bold { font-weight: bold; }
+  .dash { text-align: center; letter-spacing: 1px; color: #999; margin: 6px 0; font-size: 10px; }
+  .right { text-align: right; }
+  .red { color: #dc2626; }
+  .green { color: #16a34a; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { text-align: left; padding: 2px 4px; border-bottom: 1px solid #333; }
+  .info-row { display: flex; justify-content: space-between; font-size: 11px; }
+  .total-row { display: flex; justify-content: space-between; font-size: 12px; }
+  .grand { font-size: 14px; font-weight: bold; }
+  .footer-line { width: 120px; border-bottom: 1px solid #000; margin: 10px auto 0; }
+</style></head><body>
+  <div class="center">
+    <div class="bold" style="font-size:18px;letter-spacing:1px">FRIED & CRISPY</div>
+    <div style="font-size:11px;margin-top:4px">Main Market Sonbarsa Bazar</div>
+    <div style="font-size:11px">Gorakhpur</div>
+    <div style="font-size:11px">Phone: 8005040580</div>
+    <div style="font-size:11px">E-Mail: info@friedandcrispy.com</div>
+  </div>
+  <div class="dash">${dash}</div>
+  <div class="info-row"><span>Customer: ${paymentMethod.toUpperCase()}</span><span>Bill No: ${billNo}</span></div>
+  <div class="info-row"><span>Mobile:</span><span>Date: ${date}</span></div>
+  <div class="info-row"><span>User: ADMIN</span><span>Time: ${time}</span></div>
+  <div class="dash">${dash}</div>
+  <table>
+    <tr><th>S.</th><th>Description</th><th style="text-align:center">Qty</th><th style="text-align:right">Rate</th><th style="text-align:right">Amt</th></tr>
+    ${itemRows}
+  </table>
+  <div class="dash">${dash}</div>
+  <div class="right" style="font-size:11px">Item Qty: ${totalQty}</div>
+  <div class="right" style="font-size:11px">Round off: 0.00</div>
+  <div style="margin-top:8px">
+    <div class="total-row bold"><span>Subtotal:</span><span>₹${subtotal.toFixed(2)}</span></div>
+    <div class="total-row red"><span class="bold">Discount:</span><span>-₹${discount.toFixed(2)}</span></div>
+    <div class="total-row grand"><span>G.TOTAL :-</span><span>₹${total.toFixed(2)}</span></div>
+  </div>
+  <div class="right green" style="margin-top:6px;font-size:11px">Saving ₹${discount.toFixed(2)}</div>
+  <div class="dash">${dash}</div>
+  <div class="center" style="margin-top:8px">
+    <div class="bold">Happy to See you again</div>
+    <div style="font-style:italic">"FRIED & CRISPY"</div>
+    <div class="bold" style="font-size:14px;margin-top:8px">!!! Thanks !!!</div>
+    <div class="footer-line"></div>
+  </div>
+</body></html>`;
+  };
+
+  const printBill = () => {
+    const w = window.open("", "_blank");
+    if (w) {
+      w.document.write(generateBillHTML());
+      w.document.close();
+      setTimeout(() => w.print(), 300);
+    }
+  };
+
   const exportPNG = async () => {
     if (!billRef.current) return;
     const canvas = await html2canvas(billRef.current, { scale: 2, backgroundColor: "#ffffff" });
