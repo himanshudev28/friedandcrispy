@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Input } from "@/components/ui/input";
@@ -14,10 +14,11 @@ const AdminLogin = () => {
   const { login, isAdmin } = useAdmin();
   const navigate = useNavigate();
 
-  if (isAdmin) {
-    navigate("/admin/dashboard");
-    return null;
-  }
+  useEffect(() => {
+    if (isAdmin) {
+      navigate("/admin/dashboard", { replace: true });
+    }
+  }, [isAdmin, navigate]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
