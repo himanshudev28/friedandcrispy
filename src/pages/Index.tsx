@@ -34,7 +34,7 @@ const Index = () => {
         <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <Link to="/" className="flex items-center gap-2">
             <UtensilsCrossed className="h-7 w-7 text-primary" />
-            <span className="text-xl font-display font-bold text-foreground">FlameGrill</span>
+            <span className="text-xl font-display font-bold text-foreground">Fried&Crispy</span>
           </Link>
           <div className="flex items-center gap-4">
             <Link to="/menu">
