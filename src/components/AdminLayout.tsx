@@ -28,7 +28,7 @@ const AdminLayout = ({ children }: { children: ReactNode }) => {
         <div className="p-4 border-b border-sidebar-border">
           <Link to="/" className="flex items-center gap-2">
             <UtensilsCrossed className="h-6 w-6 text-sidebar-primary" />
-            <span className="text-lg font-display font-bold">FlameGrill</span>
+            <span className="text-lg font-display font-bold">Fried&Crispy</span>
           </Link>
           <p className="text-xs text-sidebar-foreground/60 font-body mt-1">Admin Panel</p>
         </div>
