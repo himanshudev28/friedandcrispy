@@ -103,12 +103,74 @@ const POSPage = () => {
   };
 
   const printBill = () => {
-    if (!billRef.current) return;
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
-    printWindow.document.write(`<html><head><title>Bill</title><style>body{margin:0;padding:20px;font-family:'Courier New',monospace}@media print{body{padding:0}}</style></head><body>${billRef.current.innerHTML}</body></html>`);
-    printWindow.document.close();
-    printWindow.print();
+    const now = new Date();
+    const formattedDate = now.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const formattedTime = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false });
+
+    const billContent = `
+      <div style="font-family:'Courier New',monospace;width:80mm;margin:0 auto;padding:10px;font-size:12px;">
+        <div style="text-align:center;margin-bottom:5px;">
+          <div style="font-size:18px;font-weight:bold;letter-spacing:2px;">FRIED & CRISPY</div>
+          <div style="font-size:10px;">Main Market Sonbarsa Bazar</div>
+          <div style="font-size:10px;">Gorakhpur</div>
+          <div style="font-size:10px;">Phone: 8005040580</div>
+          <div style="font-size:10px;">E-Mail: info@friedandcrispy.com</div>
+        </div>
+        <div style="border-top:1px dashed #000;margin:8px 0;"></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;">
+          <span>Customer: ${paymentMethod.toUpperCase()}</span>
+          <span>Bill No: A${Math.floor(Math.random() * 10000)}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;">
+          <span>Date: ${formattedDate}</span>
+          <span>Time: ${formattedTime}</span>
+        </div>
+        <div style="border-top:1px dashed #000;margin:8px 0;"></div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <tr style="border-bottom:1px dashed #000;">
+            <th style="text-align:left;padding:2px;">S</th>
+            <th style="text-align:left;padding:2px;">Item</th>
+            <th style="text-align:center;padding:2px;">Qty</th>
+            <th style="text-align:right;padding:2px;">Rate</th>
+            <th style="text-align:right;padding:2px;">Amt</th>
+          </tr>
+          ${cart.map((item, i) => `
+            <tr>
+              <td style="padding:2px;">${i + 1}</td>
+              <td style="padding:2px;">${item.name}</td>
+              <td style="text-align:center;padding:2px;">${item.quantity}</td>
+              <td style="text-align:right;padding:2px;">${item.price}</td>
+              <td style="text-align:right;padding:2px;">${(item.price * item.quantity)}</td>
+            </tr>
+          `).join("")}
+        </table>
+        <div style="border-top:1px dashed #000;margin:8px 0;"></div>
+        <div style="text-align:right;font-size:11px;">Subtotal: ₹${subtotal}</div>
+        <div style="text-align:right;font-size:11px;">Discount: -₹${discount}</div>
+        <div style="text-align:right;font-size:14px;font-weight:bold;margin-top:4px;">TOTAL: ₹${total}</div>
+        <div style="border-top:1px dashed #000;margin:8px 0;"></div>
+        <div style="text-align:center;font-size:12px;font-weight:bold;">!!! THANK YOU !!!</div>
+      </div>
+    `;
+
+    const win = window.open('', '', 'width=300,height=600');
+    if (!win) return;
+    win.document.write(`
+      <html>
+        <head>
+          <style>
+            @media print {
+              @page { size: 80mm auto; margin: 0; }
+              body { margin: 0; width: 80mm; }
+            }
+          </style>
+        </head>
+        <body onload="window.print(); window.close();">
+          ${billContent}
+        </body>
+      </html>
+    `);
+    win.document.close();
   };
 
   return (
