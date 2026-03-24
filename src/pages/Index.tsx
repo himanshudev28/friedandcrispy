@@ -56,7 +56,7 @@ const Index = () => {
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
               className="text-primary font-semibold mb-4 tracking-wider uppercase text-sm font-body"
             >
-              Welcome to FlameGrill
+              Welcome to Fried&Crispy
             </motion.p>
             <motion.h1
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
