@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { UtensilsCrossed, ChefHat, Star, Clock } from "lucide-react";
+import { UtensilsCrossed, Star, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { MenuItem } from "@/types/menu";
@@ -34,7 +34,7 @@ const Index = () => {
         <div className="container mx-auto flex items-center justify-between h-16 px-4">
           <Link to="/" className="flex items-center gap-2">
             <UtensilsCrossed className="h-7 w-7 text-primary" />
-            <span className="text-xl font-display font-bold text-foreground">FlameGrill</span>
+            <span className="text-xl font-display font-bold text-foreground">Fried&Crispy</span>
           </Link>
           <div className="flex items-center gap-4">
             <Link to="/menu">
@@ -56,7 +56,7 @@ const Index = () => {
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
               className="text-primary font-semibold mb-4 tracking-wider uppercase text-sm font-body"
             >
-              Welcome to FlameGrill
+              Welcome to Fried&Crispy
             </motion.p>
             <motion.h1
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
@@ -83,9 +83,8 @@ const Index = () => {
 
       {/* Stats */}
       <section className="border-y bg-card">
-        <div className="container mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div className="container mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
           {[
-            { icon: ChefHat, label: "Expert Chefs", value: "12+" },
             { icon: Star, label: "5-Star Reviews", value: "2K+" },
             { icon: UtensilsCrossed, label: "Menu Items", value: "80+" },
             { icon: Clock, label: "Years Serving", value: "15+" },
@@ -161,9 +160,9 @@ const Index = () => {
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <UtensilsCrossed className="h-6 w-6 text-primary" />
-            <span className="text-lg font-display font-bold text-foreground">FlameGrill</span>
+            <span className="text-lg font-display font-bold text-foreground">Fried&Crispy</span>
           </div>
-          <p className="text-sm text-muted-foreground font-body">© 2024 FlameGrill Restaurant. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground font-body">© 2024 Fried&Crispy Restaurant. All rights reserved.</p>
         </div>
       </footer>
     </div>

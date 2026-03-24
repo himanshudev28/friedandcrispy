@@ -37,7 +37,7 @@ const MenuPage = () => {
           <Link to="/" className="flex items-center gap-2">
             <ArrowLeft className="h-5 w-5" />
             <UtensilsCrossed className="h-6 w-6 text-primary" />
-            <span className="text-xl font-display font-bold">FlameGrill</span>
+            <span className="text-xl font-display font-bold">Fried&Crispy</span>
           </Link>
         </div>
       </nav>

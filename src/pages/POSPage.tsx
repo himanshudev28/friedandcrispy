@@ -151,7 +151,7 @@ const POSPage = () => {
               {/* Receipt */}
               <div ref={billRef} className="bg-white text-black p-6 rounded-xl border" style={{ fontFamily: "monospace" }}>
                 <div className="text-center mb-4">
-                  <h3 className="text-xl font-bold">🔥 FlameGrill</h3>
+                  <h3 className="text-xl font-bold">🍗 Fried&Crispy</h3>
                   <p className="text-xs text-gray-500">Restaurant & Café</p>
                   <p className="text-xs text-gray-400 mt-1">{new Date().toLocaleString()}</p>
                 </div>
