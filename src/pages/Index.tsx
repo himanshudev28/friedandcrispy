@@ -83,9 +83,8 @@ const Index = () => {
 
       {/* Stats */}
       <section className="border-y bg-card">
-        <div className="container mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div className="container mx-auto px-4 py-12 grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
           {[
-            { icon: ChefHat, label: "Expert Chefs", value: "12+" },
             { icon: Star, label: "5-Star Reviews", value: "2K+" },
             { icon: UtensilsCrossed, label: "Menu Items", value: "80+" },
             { icon: Clock, label: "Years Serving", value: "15+" },
