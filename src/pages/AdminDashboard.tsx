@@ -12,12 +12,25 @@ import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
 const AdminDashboard = () => {
+  const queryClient = useQueryClient();
   const { data: sales = [] } = useQuery({
     queryKey: ["sales"],
     queryFn: async () => {
       const { data } = await supabase.from("sales").select("*").order("created_at", { ascending: false });
       return (data as unknown as SaleRecord[]) || [];
     },
+  });
+
+  const deleteSale = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("sales").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sales"] });
+      toast.success("Sale deleted");
+    },
+    onError: () => toast.error("Failed to delete sale"),
   });
 
   const totalRevenue = sales.reduce((sum, s) => sum + s.total, 0);
