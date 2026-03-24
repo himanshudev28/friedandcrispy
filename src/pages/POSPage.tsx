@@ -214,15 +214,18 @@ const POSPage = () => {
                 <p className="text-center text-xs text-gray-500">Payment: {paymentMethod}</p>
                 <p className="text-center text-xs text-gray-400 mt-2">Thank you for dining with us! ❤️</p>
               </div>
-              <div className="flex gap-2 mt-4">
-                <Button variant="outline" className="flex-1 font-body" onClick={exportPNG}>
+              <div className="grid grid-cols-2 gap-2 mt-4">
+                <Button variant="outline" className="font-body" onClick={exportPNG}>
                   <Download className="h-4 w-4 mr-1" /> PNG
                 </Button>
-                <Button variant="outline" className="flex-1 font-body" onClick={exportPDF}>
+                <Button variant="outline" className="font-body" onClick={exportPDF}>
                   <Download className="h-4 w-4 mr-1" /> PDF
                 </Button>
-                <Button className="flex-1 font-body" onClick={clearCart}>
-                  <Printer className="h-4 w-4 mr-1" /> New Order
+                <Button variant="outline" className="font-body" onClick={printBill}>
+                  <Printer className="h-4 w-4 mr-1" /> Print Bill
+                </Button>
+                <Button className="font-body" onClick={clearCart}>
+                  <Plus className="h-4 w-4 mr-1" /> New Order
                 </Button>
               </div>
             </div>
