@@ -104,15 +104,15 @@ const POSPage = () => {
 
   const printBill = () => {
     const now = new Date();
-    const formattedDate = now.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-    const formattedTime = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false });
+    const formattedDate = now.toLocaleDateString("en-IN", { day: "2-digit", month: "2-digit", year: "numeric" });
+    const formattedTime = now.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: false });
 
     const billContent = `
       <div style="font-family:'Courier New',monospace;width:80mm;margin:0 auto;padding:10px;font-size:12px;">
         <div style="text-align:center;margin-bottom:5px;">
           <div style="font-size:18px;font-weight:bold;letter-spacing:2px;">FRIED & CRISPY</div>
-          <div style="font-size:10px;">Main Market Sonbarsa Bazar</div>
-          <div style="font-size:10px;">Gorakhpur</div>
+          <div style="font-size:10px;">Koni Jagdishpur Bypass Gorakhpur</div>
+          // <div style="font-size:10px;">Gorakhpur</div>
           <div style="font-size:10px;">Phone: 8005040580</div>
           <div style="font-size:10px;">E-Mail: info@friedandcrispy.com</div>
         </div>
@@ -134,15 +134,19 @@ const POSPage = () => {
             <th style="text-align:right;padding:2px;">Rate</th>
             <th style="text-align:right;padding:2px;">Amt</th>
           </tr>
-          ${cart.map((item, i) => `
+          ${cart
+            .map(
+              (item, i) => `
             <tr>
               <td style="padding:2px;">${i + 1}</td>
               <td style="padding:2px;">${item.name}</td>
               <td style="text-align:center;padding:2px;">${item.quantity}</td>
               <td style="text-align:right;padding:2px;">${item.price}</td>
-              <td style="text-align:right;padding:2px;">${(item.price * item.quantity)}</td>
+              <td style="text-align:right;padding:2px;">${item.price * item.quantity}</td>
             </tr>
-          `).join("")}
+          `,
+            )
+            .join("")}
         </table>
         <div style="border-top:1px dashed #000;margin:8px 0;"></div>
         <div style="text-align:right;font-size:11px;">Subtotal: ₹${subtotal}</div>
@@ -156,7 +160,7 @@ const POSPage = () => {
       </div>
     `;
 
-    const win = window.open('', '_blank');
+    const win = window.open("", "_blank");
     if (!win) return;
     win.document.write(`
       <html>
