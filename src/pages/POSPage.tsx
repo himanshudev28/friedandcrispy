@@ -112,7 +112,7 @@ const POSPage = () => {
         <div style="text-align:center;margin-bottom:5px;">
           <div style="font-size:18px;font-weight:bold;letter-spacing:2px;">FRIED & CRISPY</div>
           <div style="font-size:10px;">Koni Jagdishpur Bypass Gorakhpur</div>
-          // <div style="font-size:10px;">Gorakhpur</div>
+          
           <div style="font-size:10px;">Phone: 8005040580</div>
           <div style="font-size:10px;">E-Mail: info@friedandcrispy.com</div>
         </div>
