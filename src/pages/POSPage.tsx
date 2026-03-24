@@ -316,7 +316,7 @@ const POSPage = () => {
                 <Button variant="outline" className="flex-1 font-body" onClick={exportPDF}><Download className="h-4 w-4 mr-1" /> PDF</Button>
               </div>
               <div className="flex gap-2 mt-2">
-                <Button variant="secondary" className="flex-1 font-body" onClick={() => { if (billRef.current) { const w = window.open("", "_blank"); if (w) { w.document.write(`<html><body style="margin:0;padding:20px;font-family:'Courier New',monospace">${billRef.current.innerHTML}</body></html>`); w.document.close(); w.print(); } } }}>
+                <Button variant="secondary" className="flex-1 font-body" onClick={printBill}>
                   <Printer className="h-4 w-4 mr-1" /> Print Bill
                 </Button>
                 <Button className="flex-1 font-body" onClick={clearCart}>New Order</Button>
