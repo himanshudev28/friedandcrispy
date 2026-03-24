@@ -149,23 +149,27 @@ const POSPage = () => {
         <div style="text-align:right;font-size:11px;">Discount: -₹${discount}</div>
         <div style="text-align:right;font-size:14px;font-weight:bold;margin-top:4px;">TOTAL: ₹${total}</div>
         <div style="border-top:1px dashed #000;margin:8px 0;"></div>
+        <div style="text-align:center;font-size:11px;">Payment: ${paymentMethod}</div>
+        <div style="text-align:center;font-size:11px;margin-top:6px;">Thank you for dining with us! ❤️</div>
+        <div style="border-top:1px dashed #000;margin:8px 0;"></div>
         <div style="text-align:center;font-size:12px;font-weight:bold;">!!! THANK YOU !!!</div>
       </div>
     `;
 
-    const win = window.open('', '', 'width=300,height=600');
+    const win = window.open('', '_blank');
     if (!win) return;
     win.document.write(`
       <html>
         <head>
           <style>
+            body { margin: 0; padding: 20px; }
             @media print {
               @page { size: 80mm auto; margin: 0; }
-              body { margin: 0; width: 80mm; }
+              body { margin: 0; padding: 0; width: 80mm; }
             }
           </style>
         </head>
-        <body onload="window.print(); window.close();">
+        <body onload="window.print();">
           ${billContent}
         </body>
       </html>
