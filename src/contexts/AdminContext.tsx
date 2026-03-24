@@ -18,7 +18,7 @@ export const AdminProvider = ({ children }: { children: ReactNode }) => {
   const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem("isAdmin") === "true");
 
   const login = (username: string, password: string) => {
-    if (username === "admin" && password === "admin123") {
+    if (username === "Prince" && password === "prince#7007") {
       setIsAdmin(true);
       localStorage.setItem("isAdmin", "true");
       return true;
