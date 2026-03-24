@@ -1,0 +1,1 @@
+CREATE POLICY "Allow all deletes on sales" ON public.sales FOR DELETE TO public USING (true);
