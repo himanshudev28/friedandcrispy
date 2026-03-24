@@ -1,22 +1,36 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SaleRecord } from "@/types/menu";
 import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { DollarSign, TrendingUp, ShoppingCart, Download } from "lucide-react";
+import { DollarSign, TrendingUp, ShoppingCart, Download, Trash2 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 import { format, subDays, startOfDay, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
 import * as XLSX from "xlsx";
+import { toast } from "sonner";
 
 const AdminDashboard = () => {
+  const queryClient = useQueryClient();
   const { data: sales = [] } = useQuery({
     queryKey: ["sales"],
     queryFn: async () => {
       const { data } = await supabase.from("sales").select("*").order("created_at", { ascending: false });
       return (data as unknown as SaleRecord[]) || [];
     },
+  });
+
+  const deleteSale = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("sales").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["sales"] });
+      toast.success("Sale deleted");
+    },
+    onError: () => toast.error("Failed to delete sale"),
   });
 
   const totalRevenue = sales.reduce((sum, s) => sum + s.total, 0);
@@ -190,6 +204,7 @@ const AdminDashboard = () => {
                     <TableHead className="font-body">Items</TableHead>
                     <TableHead className="font-body">Total</TableHead>
                     <TableHead className="font-body">Payment</TableHead>
+                    <TableHead className="font-body text-right">Action</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -207,6 +222,11 @@ const AdminDashboard = () => {
                         }`}>
                           {sale.payment_method}
                         </span>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => deleteSale.mutate(sale.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
