@@ -102,6 +102,15 @@ const POSPage = () => {
     toast.success("Bill downloaded as PDF");
   };
 
+  const printBill = () => {
+    if (!billRef.current) return;
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) return;
+    printWindow.document.write(`<html><head><title>Bill</title><style>body{margin:0;padding:20px;font-family:'Courier New',monospace}@media print{body{padding:0}}</style></head><body>${billRef.current.innerHTML}</body></html>`);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
   return (
     <AdminLayout>
       <div className="flex flex-col lg:flex-row h-[calc(100vh-56px)] md:h-screen overflow-hidden">
