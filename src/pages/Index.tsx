@@ -160,9 +160,9 @@ const Index = () => {
         <div className="container mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <UtensilsCrossed className="h-6 w-6 text-primary" />
-            <span className="text-lg font-display font-bold text-foreground">FlameGrill</span>
+            <span className="text-lg font-display font-bold text-foreground">Fried&Crispy</span>
           </div>
-          <p className="text-sm text-muted-foreground font-body">© 2024 FlameGrill Restaurant. All rights reserved.</p>
+          <p className="text-sm text-muted-foreground font-body">© 2024 Fried&Crispy Restaurant. All rights reserved.</p>
         </div>
       </footer>
     </div>
