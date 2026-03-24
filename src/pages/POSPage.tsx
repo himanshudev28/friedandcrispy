@@ -148,36 +148,99 @@ const POSPage = () => {
 
           {showBill ? (
             <div className="flex-1 overflow-auto p-4">
-              {/* Receipt */}
-              <div ref={billRef} className="bg-white text-black p-6 rounded-xl border" style={{ fontFamily: "monospace" }}>
-                <div className="text-center mb-4">
-                  <h3 className="text-xl font-bold">🍗 Fried&Crispy</h3>
-                  <p className="text-xs text-gray-500">Restaurant & Café</p>
-                  <p className="text-xs text-gray-400 mt-1">{new Date().toLocaleString()}</p>
+              {/* Receipt - styled like a real bill */}
+              <div ref={billRef} className="bg-white text-black p-6 rounded-xl border" style={{ fontFamily: "'Courier New', Courier, monospace", fontSize: "13px" }}>
+                {/* Header */}
+                <div className="text-center mb-1">
+                  <h3 className="text-xl font-bold tracking-wide">FRIED & CRISPY</h3>
+                  <p className="text-xs mt-1">Main Market Sonbarsa Bazar</p>
+                  <p className="text-xs">Gorakhpur</p>
+                  <p className="text-xs">Phone: 8005040580</p>
+                  <p className="text-xs">E-Mail: info@friedandcrispy.com</p>
                 </div>
-                <Separator className="my-3" />
-                <div className="space-y-2 text-sm">
-                  {cart.map((item) => (
-                    <div key={item.id} className="flex justify-between">
-                      <span>{item.name} x{item.quantity}</span>
-                      <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+
+                <p className="text-center text-xs my-2" style={{ letterSpacing: "2px" }}>
+                  {"- ".repeat(30)}
+                </p>
+
+                {/* Customer & Bill Info */}
+                <div className="text-xs space-y-0.5">
+                  <div className="flex justify-between"><span>Customer: {paymentMethod.toUpperCase()}</span><span>Bill No: A{Math.floor(1000 + Math.random() * 9000)}</span></div>
+                  <div className="flex justify-between"><span>Mobile:</span><span>Date: {new Date().toLocaleDateString("en-GB")}</span></div>
+                  <div className="flex justify-between"><span>User: ADMIN</span><span>Time: {new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span></div>
+                </div>
+
+                <p className="text-center text-xs my-2" style={{ letterSpacing: "2px" }}>
+                  {"- ".repeat(30)}
+                </p>
+
+                {/* Items Table Header */}
+                <div className="text-xs font-bold flex mb-1">
+                  <span className="w-6">S.</span>
+                  <span className="flex-1">Description</span>
+                  <span className="w-10 text-center">Qty</span>
+                  <span className="w-16 text-right">Rate</span>
+                  <span className="w-16 text-right">Amt</span>
+                </div>
+
+                {/* Items */}
+                <div className="text-xs space-y-1">
+                  {cart.map((item, index) => (
+                    <div key={item.id} className="flex">
+                      <span className="w-6">{index + 1}</span>
+                      <span className="flex-1 truncate">{item.name}</span>
+                      <span className="w-10 text-center">{item.quantity}</span>
+                      <span className="w-16 text-right">{item.price.toFixed(2)}</span>
+                      <span className="w-16 text-right">{(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
-                <Separator className="my-3" />
-                <div className="space-y-1 text-sm">
-                  <div className="flex justify-between"><span>Subtotal</span><span>₹{subtotal.toFixed(2)}</span></div>
-                  {discount > 0 && <div className="flex justify-between text-green-600"><span>Discount</span><span>-₹{discount.toFixed(2)}</span></div>}
-                  <div className="flex justify-between font-bold text-lg mt-2"><span>Total</span><span>₹{total.toFixed(2)}</span></div>
+
+                <p className="text-center text-xs my-2" style={{ letterSpacing: "2px" }}>
+                  {"- ".repeat(30)}
+                </p>
+
+                {/* Totals */}
+                <div className="text-xs text-right space-y-0.5">
+                  <p>Item Qty: {cart.reduce((sum, c) => sum + c.quantity, 0)}</p>
+                  <p>Round off: 0.00</p>
                 </div>
-                <Separator className="my-3" />
-                <p className="text-center text-xs text-gray-500">Payment: {paymentMethod}</p>
-                <p className="text-center text-xs text-gray-400 mt-2">Thank you for dining with us! ❤️</p>
+
+                <div className="text-xs mt-2 space-y-1">
+                  <div className="flex justify-between font-bold"><span>Subtotal:</span><span>₹{subtotal.toFixed(2)}</span></div>
+                  <div className="flex justify-between" style={{ color: "#dc2626" }}><span className="font-bold">Discount:</span><span>-₹{discount.toFixed(2)}</span></div>
+                  <div className="flex justify-between font-bold text-sm"><span>G.TOTAL :-</span><span>₹{total.toFixed(2)}</span></div>
+                </div>
+
+                <div className="text-right text-xs mt-2" style={{ color: "#16a34a" }}>
+                  <p>Saving ₹{discount.toFixed(2)}</p>
+                </div>
+
+                <p className="text-center text-xs my-2" style={{ letterSpacing: "2px" }}>
+                  {"- ".repeat(30)}
+                </p>
+
+                {/* Footer */}
+                <div className="text-center text-xs space-y-1 mt-2">
+                  <p className="font-bold">Happy to See you again</p>
+                  <p className="italic">"FRIED & CRISPY"</p>
+                  <p className="font-bold text-sm mt-2">!!! Thanks !!!</p>
+                  <div className="flex justify-center mt-3">
+                    <div className="w-32 border-b border-black"></div>
+                  </div>
+                </div>
               </div>
+
+              {/* Action Buttons */}
               <div className="flex gap-2 mt-4">
                 <Button variant="outline" className="flex-1 font-body" onClick={exportPNG}><Download className="h-4 w-4 mr-1" /> PNG</Button>
                 <Button variant="outline" className="flex-1 font-body" onClick={exportPDF}><Download className="h-4 w-4 mr-1" /> PDF</Button>
-                <Button className="flex-1 font-body" onClick={clearCart}><Printer className="h-4 w-4 mr-1" /> New Order</Button>
+              </div>
+              <div className="flex gap-2 mt-2">
+                <Button variant="secondary" className="flex-1 font-body" onClick={() => { if (billRef.current) { const w = window.open("", "_blank"); if (w) { w.document.write(`<html><body style="margin:0;padding:20px;font-family:'Courier New',monospace">${billRef.current.innerHTML}</body></html>`); w.document.close(); w.print(); } } }}>
+                  <Printer className="h-4 w-4 mr-1" /> Print Bill
+                </Button>
+                <Button className="flex-1 font-body" onClick={clearCart}>New Order</Button>
               </div>
             </div>
           ) : (
