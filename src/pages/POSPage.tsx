@@ -48,12 +48,18 @@ const POSPage = () => {
 
   const updateQty = (id: string, delta: number) => {
     setCart((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, quantity: Math.max(0, c.quantity + delta) } : c)).filter((c) => c.quantity > 0)
+      prev
+        .map((c) => (c.id === id ? { ...c, quantity: Math.max(0, c.quantity + delta) } : c))
+        .filter((c) => c.quantity > 0),
     );
   };
 
   const removeFromCart = (id: string) => setCart((prev) => prev.filter((c) => c.id !== id));
-  const clearCart = () => { setCart([]); setDiscount(0); setShowBill(false); };
+  const clearCart = () => {
+    setCart([]);
+    setDiscount(0);
+    setShowBill(false);
+  };
 
   const subtotal = cart.reduce((sum, c) => sum + c.price * c.quantity, 0);
   const total = Math.max(0, subtotal - discount);
@@ -75,85 +81,6 @@ const POSPage = () => {
     },
     onError: () => toast.error("Failed to save sale"),
   });
-
-  const generateBillHTML = () => {
-    const now = new Date();
-    const billNo = `A${Math.floor(1000 + Math.random() * 9000)}`;
-    const date = now.toLocaleDateString("en-GB");
-    const time = now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
-    const totalQty = cart.reduce((sum, c) => sum + c.quantity, 0);
-    const dash = "- ".repeat(35);
-
-    const itemRows = cart.map((item, i) =>
-      `<tr>
-        <td style="padding:2px 4px">${i + 1}</td>
-        <td style="padding:2px 4px">${item.name}</td>
-        <td style="padding:2px 4px;text-align:center">${item.quantity}</td>
-        <td style="padding:2px 4px;text-align:right">${item.price.toFixed(2)}</td>
-        <td style="padding:2px 4px;text-align:right">${(item.price * item.quantity).toFixed(2)}</td>
-      </tr>`
-    ).join("");
-
-    return `<!DOCTYPE html>
-<html><head><style>
-  @page { size: 80mm auto; margin: 5mm; }
-  body { font-family: 'Courier New', Courier, monospace; font-size: 12px; color: #000; margin: 0; padding: 15px; max-width: 350px; margin: 0 auto; }
-  .center { text-align: center; }
-  .bold { font-weight: bold; }
-  .dash { text-align: center; letter-spacing: 1px; color: #999; margin: 6px 0; font-size: 10px; }
-  .right { text-align: right; }
-  .red { color: #dc2626; }
-  .green { color: #16a34a; }
-  table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  th { text-align: left; padding: 2px 4px; border-bottom: 1px solid #333; }
-  .info-row { display: flex; justify-content: space-between; font-size: 11px; }
-  .total-row { display: flex; justify-content: space-between; font-size: 12px; }
-  .grand { font-size: 14px; font-weight: bold; }
-  .footer-line { width: 120px; border-bottom: 1px solid #000; margin: 10px auto 0; }
-</style></head><body>
-  <div class="center">
-    <div class="bold" style="font-size:18px;letter-spacing:1px">FRIED & CRISPY</div>
-    <div style="font-size:11px;margin-top:4px">Main Market Sonbarsa Bazar</div>
-    <div style="font-size:11px">Gorakhpur</div>
-    <div style="font-size:11px">Phone: 8005040580</div>
-    <div style="font-size:11px">E-Mail: info@friedandcrispy.com</div>
-  </div>
-  <div class="dash">${dash}</div>
-  <div class="info-row"><span>Customer: ${paymentMethod.toUpperCase()}</span><span>Bill No: ${billNo}</span></div>
-  <div class="info-row"><span>Mobile:</span><span>Date: ${date}</span></div>
-  <div class="info-row"><span>User: ADMIN</span><span>Time: ${time}</span></div>
-  <div class="dash">${dash}</div>
-  <table>
-    <tr><th>S.</th><th>Description</th><th style="text-align:center">Qty</th><th style="text-align:right">Rate</th><th style="text-align:right">Amt</th></tr>
-    ${itemRows}
-  </table>
-  <div class="dash">${dash}</div>
-  <div class="right" style="font-size:11px">Item Qty: ${totalQty}</div>
-  <div class="right" style="font-size:11px">Round off: 0.00</div>
-  <div style="margin-top:8px">
-    <div class="total-row bold"><span>Subtotal:</span><span>₹${subtotal.toFixed(2)}</span></div>
-    <div class="total-row red"><span class="bold">Discount:</span><span>-₹${discount.toFixed(2)}</span></div>
-    <div class="total-row grand"><span>G.TOTAL :-</span><span>₹${total.toFixed(2)}</span></div>
-  </div>
-  <div class="right green" style="margin-top:6px;font-size:11px">Saving ₹${discount.toFixed(2)}</div>
-  <div class="dash">${dash}</div>
-  <div class="center" style="margin-top:8px">
-    <div class="bold">Happy to See you again</div>
-    <div style="font-style:italic">"FRIED & CRISPY"</div>
-    <div class="bold" style="font-size:14px;margin-top:8px">!!! Thanks !!!</div>
-    <div class="footer-line"></div>
-  </div>
-</body></html>`;
-  };
-
-  const printBill = () => {
-    const w = window.open("", "_blank");
-    if (w) {
-      w.document.write(generateBillHTML());
-      w.document.close();
-      setTimeout(() => w.print(), 300);
-    }
-  };
 
   const exportPNG = async () => {
     if (!billRef.current) return;
@@ -183,24 +110,41 @@ const POSPage = () => {
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search menu..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10 font-body" />
+              <Input
+                placeholder="Search menu..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 font-body"
+              />
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
             {categories.map((cat) => (
-              <Button key={cat} variant={selectedCategory === cat ? "default" : "outline"} size="sm" className="rounded-full font-body text-xs"
-                onClick={() => setSelectedCategory(cat)}>
+              <Button
+                key={cat}
+                variant={selectedCategory === cat ? "default" : "outline"}
+                size="sm"
+                className="rounded-full font-body text-xs"
+                onClick={() => setSelectedCategory(cat)}
+              >
                 {cat}
               </Button>
             ))}
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3">
             {filtered.map((item) => (
-              <button key={item.id} onClick={() => addToCart(item)}
-                className="bg-card border rounded-xl p-3 text-left hover:border-primary/50 hover:shadow-md transition-all group">
+              <button
+                key={item.id}
+                onClick={() => addToCart(item)}
+                className="bg-card border rounded-xl p-3 text-left hover:border-primary/50 hover:shadow-md transition-all group"
+              >
                 {item.image_url ? (
                   <div className="aspect-square rounded-lg overflow-hidden mb-2">
-                    <img src={item.image_url} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                    <img
+                      src={item.image_url}
+                      alt={item.name}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                    />
                   </div>
                 ) : (
                   <div className="aspect-square rounded-lg bg-muted flex items-center justify-center mb-2">
@@ -227,99 +171,59 @@ const POSPage = () => {
 
           {showBill ? (
             <div className="flex-1 overflow-auto p-4">
-              {/* Receipt - styled like a real bill */}
-              <div ref={billRef} className="bg-white text-black p-6 rounded-xl border" style={{ fontFamily: "'Courier New', Courier, monospace", fontSize: "13px" }}>
-                {/* Header */}
-                <div className="text-center mb-1">
-                  <h3 className="text-xl font-bold tracking-wide">FRIED & CRISPY</h3>
-                  <p className="text-xs mt-1">Main Market Sonbarsa Bazar</p>
-                  <p className="text-xs">Gorakhpur</p>
-                  <p className="text-xs">Phone: 8005040580</p>
-                  <p className="text-xs">E-Mail: info@friedandcrispy.com</p>
+              {/* Receipt */}
+              <div
+                ref={billRef}
+                className="bg-white text-black p-6 rounded-xl border"
+                style={{ fontFamily: "monospace" }}
+              >
+                <div className="text-center mb-4">
+                  <h3 className="text-xl font-bold">🔥 Fried&Crispy</h3>
+                  <p className="text-xs text-gray-500">Restaurant & Café</p>
+                  <p className="text-xs text-gray-400 mt-1">{new Date().toLocaleString()}</p>
                 </div>
-
-                <p className="text-center text-xs my-2" style={{ letterSpacing: "2px" }}>
-                  {"- ".repeat(30)}
-                </p>
-
-                {/* Customer & Bill Info */}
-                <div className="text-xs space-y-0.5">
-                  <div className="flex justify-between"><span>Customer: {paymentMethod.toUpperCase()}</span><span>Bill No: A{Math.floor(1000 + Math.random() * 9000)}</span></div>
-                  <div className="flex justify-between"><span>Mobile:</span><span>Date: {new Date().toLocaleDateString("en-GB")}</span></div>
-                  <div className="flex justify-between"><span>User: ADMIN</span><span>Time: {new Date().toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</span></div>
-                </div>
-
-                <p className="text-center text-xs my-2" style={{ letterSpacing: "2px" }}>
-                  {"- ".repeat(30)}
-                </p>
-
-                {/* Items Table Header */}
-                <div className="text-xs font-bold flex mb-1">
-                  <span className="w-6">S.</span>
-                  <span className="flex-1">Description</span>
-                  <span className="w-10 text-center">Qty</span>
-                  <span className="w-16 text-right">Rate</span>
-                  <span className="w-16 text-right">Amt</span>
-                </div>
-
-                {/* Items */}
-                <div className="text-xs space-y-1">
-                  {cart.map((item, index) => (
-                    <div key={item.id} className="flex">
-                      <span className="w-6">{index + 1}</span>
-                      <span className="flex-1 truncate">{item.name}</span>
-                      <span className="w-10 text-center">{item.quantity}</span>
-                      <span className="w-16 text-right">{item.price.toFixed(2)}</span>
-                      <span className="w-16 text-right">{(item.price * item.quantity).toFixed(2)}</span>
+                <Separator className="my-3" />
+                <div className="space-y-2 text-sm">
+                  {cart.map((item) => (
+                    <div key={item.id} className="flex justify-between">
+                      <span>
+                        {item.name} x{item.quantity}
+                      </span>
+                      <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                     </div>
                   ))}
                 </div>
-
-                <p className="text-center text-xs my-2" style={{ letterSpacing: "2px" }}>
-                  {"- ".repeat(30)}
-                </p>
-
-                {/* Totals */}
-                <div className="text-xs text-right space-y-0.5">
-                  <p>Item Qty: {cart.reduce((sum, c) => sum + c.quantity, 0)}</p>
-                  <p>Round off: 0.00</p>
-                </div>
-
-                <div className="text-xs mt-2 space-y-1">
-                  <div className="flex justify-between font-bold"><span>Subtotal:</span><span>₹{subtotal.toFixed(2)}</span></div>
-                  <div className="flex justify-between" style={{ color: "#dc2626" }}><span className="font-bold">Discount:</span><span>-₹{discount.toFixed(2)}</span></div>
-                  <div className="flex justify-between font-bold text-sm"><span>G.TOTAL :-</span><span>₹{total.toFixed(2)}</span></div>
-                </div>
-
-                <div className="text-right text-xs mt-2" style={{ color: "#16a34a" }}>
-                  <p>Saving ₹{discount.toFixed(2)}</p>
-                </div>
-
-                <p className="text-center text-xs my-2" style={{ letterSpacing: "2px" }}>
-                  {"- ".repeat(30)}
-                </p>
-
-                {/* Footer */}
-                <div className="text-center text-xs space-y-1 mt-2">
-                  <p className="font-bold">Happy to See you again</p>
-                  <p className="italic">"FRIED & CRISPY"</p>
-                  <p className="font-bold text-sm mt-2">!!! Thanks !!!</p>
-                  <div className="flex justify-center mt-3">
-                    <div className="w-32 border-b border-black"></div>
+                <Separator className="my-3" />
+                <div className="space-y-1 text-sm">
+                  <div className="flex justify-between">
+                    <span>Subtotal</span>
+                    <span>₹{subtotal.toFixed(2)}</span>
+                  </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Discount</span>
+                      <span>-₹{discount.toFixed(2)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-bold text-lg mt-2">
+                    <span>Total</span>
+                    <span>₹{total.toFixed(2)}</span>
                   </div>
                 </div>
+                <Separator className="my-3" />
+                <p className="text-center text-xs text-gray-500">Payment: {paymentMethod}</p>
+                <p className="text-center text-xs text-gray-400 mt-2">Thank you for dining with us! ❤️</p>
               </div>
-
-              {/* Action Buttons */}
               <div className="flex gap-2 mt-4">
-                <Button variant="outline" className="flex-1 font-body" onClick={exportPNG}><Download className="h-4 w-4 mr-1" /> PNG</Button>
-                <Button variant="outline" className="flex-1 font-body" onClick={exportPDF}><Download className="h-4 w-4 mr-1" /> PDF</Button>
-              </div>
-              <div className="flex gap-2 mt-2">
-                <Button variant="secondary" className="flex-1 font-body" onClick={printBill}>
-                  <Printer className="h-4 w-4 mr-1" /> Print Bill
+                <Button variant="outline" className="flex-1 font-body" onClick={exportPNG}>
+                  <Download className="h-4 w-4 mr-1" /> PNG
                 </Button>
-                <Button className="flex-1 font-body" onClick={clearCart}>New Order</Button>
+                <Button variant="outline" className="flex-1 font-body" onClick={exportPDF}>
+                  <Download className="h-4 w-4 mr-1" /> PDF
+                </Button>
+                <Button className="flex-1 font-body" onClick={clearCart}>
+                  <Printer className="h-4 w-4 mr-1" /> New Order
+                </Button>
               </div>
             </div>
           ) : (
@@ -338,7 +242,12 @@ const POSPage = () => {
                         <p className="text-xs text-muted-foreground font-body">₹{item.price.toFixed(2)} each</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQty(item.id, -1)}>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-7 w-7"
+                          onClick={() => updateQty(item.id, -1)}
+                        >
                           <Minus className="h-3 w-3" />
                         </Button>
                         <span className="w-6 text-center text-sm font-bold font-body">{item.quantity}</span>
@@ -346,8 +255,15 @@ const POSPage = () => {
                           <Plus className="h-3 w-3" />
                         </Button>
                       </div>
-                      <p className="font-bold text-sm font-body w-16 text-right">₹{(item.price * item.quantity).toFixed(2)}</p>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => removeFromCart(item.id)}>
+                      <p className="font-bold text-sm font-body w-16 text-right">
+                        ₹{(item.price * item.quantity).toFixed(2)}
+                      </p>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-destructive"
+                        onClick={() => removeFromCart(item.id)}
+                      >
                         <Trash2 className="h-3 w-3" />
                       </Button>
                     </div>
@@ -359,25 +275,53 @@ const POSPage = () => {
                 <div className="border-t p-4 space-y-3">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-body text-muted-foreground">Discount ₹</span>
-                    <Input type="number" min={0} value={discount || ""} onChange={(e) => setDiscount(Number(e.target.value))}
-                      className="h-8 w-24 font-body text-sm" placeholder="0" />
+                    <Input
+                      type="number"
+                      min={0}
+                      value={discount || ""}
+                      onChange={(e) => setDiscount(Number(e.target.value))}
+                      className="h-8 w-24 font-body text-sm"
+                      placeholder="0"
+                    />
                   </div>
                   <div className="space-y-1 text-sm font-body">
-                    <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>₹{subtotal.toFixed(2)}</span></div>
-                    {discount > 0 && <div className="flex justify-between text-success"><span>Discount</span><span>-₹{discount.toFixed(2)}</span></div>}
-                    <div className="flex justify-between text-lg font-bold"><span>Total</span><span>₹{total.toFixed(2)}</span></div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Subtotal</span>
+                      <span>₹{subtotal.toFixed(2)}</span>
+                    </div>
+                    {discount > 0 && (
+                      <div className="flex justify-between text-success">
+                        <span>Discount</span>
+                        <span>-₹{discount.toFixed(2)}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between text-lg font-bold">
+                      <span>Total</span>
+                      <span>₹{total.toFixed(2)}</span>
+                    </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button variant={paymentMethod === "Cash" ? "default" : "outline"} className="flex-1 font-body"
-                      onClick={() => setPaymentMethod("Cash")}>
+                    <Button
+                      variant={paymentMethod === "Cash" ? "default" : "outline"}
+                      className="flex-1 font-body"
+                      onClick={() => setPaymentMethod("Cash")}
+                    >
                       <Banknote className="h-4 w-4 mr-1" /> Cash
                     </Button>
-                    <Button variant={paymentMethod === "Online" ? "default" : "outline"} className="flex-1 font-body"
-                      onClick={() => setPaymentMethod("Online")}>
+                    <Button
+                      variant={paymentMethod === "Online" ? "default" : "outline"}
+                      className="flex-1 font-body"
+                      onClick={() => setPaymentMethod("Online")}
+                    >
                       <CreditCard className="h-4 w-4 mr-1" /> Online
                     </Button>
                   </div>
-                  <Button className="w-full font-body" size="lg" onClick={() => saveSale.mutate()} disabled={saveSale.isPending}>
+                  <Button
+                    className="w-full font-body"
+                    size="lg"
+                    onClick={() => saveSale.mutate()}
+                    disabled={saveSale.isPending}
+                  >
                     {saveSale.isPending ? "Saving..." : `Charge ₹${total.toFixed(2)}`}
                   </Button>
                 </div>
