@@ -98,10 +98,6 @@ const AdminOrders = () => {
     openWhatsApp(phoneWithCode, messages[type]);
   };
 
-  const handleAction = (order: Order, status: "accepted" | "rejected" | "completed") => {
-    updateStatus.mutate({ id: order.id, status });
-    sendWhatsApp(order, status);
-  };
 
   const canTransition = (current: string, next: string) => {
     if (current === "pending") return next === "accepted" || next === "rejected";
