@@ -6,6 +6,7 @@ import { MenuItem, CartItem } from "@/types/menu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UtensilsCrossed, Search, ArrowLeft, Plus } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import CartDrawer from "@/components/menu/CartDrawer";
