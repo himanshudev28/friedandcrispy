@@ -12,6 +12,7 @@ import AdminMenuManager from "./pages/AdminMenuManager";
 import AdminCategories from "./pages/AdminCategories";
 import AdminOrders from "./pages/AdminOrders";
 import POSPage from "./pages/POSPage";
+import TrackOrder from "./pages/TrackOrder";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
