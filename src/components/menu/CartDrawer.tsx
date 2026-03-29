@@ -62,7 +62,7 @@ const CartDrawer = ({ cart, onUpdateQty, onRemove, onClear }: CartDrawerProps) =
 
     try {
       // Save to database
-      const { error } = await supabase.from("orders").insert({
+      const { data: orderData, error } = await supabase.from("orders").insert({
         items: cart.map(c => ({ id: c.id, name: c.name, price: c.price, quantity: c.quantity })) as any,
         total,
         customer_name: details.name.trim(),
@@ -71,28 +71,18 @@ const CartDrawer = ({ cart, onUpdateQty, onRemove, onClear }: CartDrawerProps) =
         order_type: details.orderType,
         payment_method: details.paymentMethod,
         status: "pending",
-      });
+      }).select().single();
       if (error) throw error;
+
+      const generatedOrderId = (orderData as any)?.order_id || "N/A";
+      localStorage.setItem("lastOrderId", generatedOrderId);
 
       // Send WhatsApp notification
       const itemLines = cart.map(c => `- ${c.name} x${c.quantity} = ₹${(c.price * c.quantity).toFixed(2)}`).join("\n");
-      const message = `New Order 🚨
-
-Items:
-${itemLines}
-
-Total: ₹${total.toFixed(2)}
-
-Customer Details:
-Name: ${details.name.trim()}
-Phone: ${details.phone.trim()}
-Address: ${details.address.trim() || "N/A (Pickup)"}
-
-Order Type: ${details.orderType}
-Payment Method: ${details.paymentMethod}`;
+      const message = `New Order 🚨\nOrder ID: ${generatedOrderId}\n\nItems:\n${itemLines}\n\nTotal: ₹${total.toFixed(2)}\n\nCustomer Details:\nName: ${details.name.trim()}\nPhone: ${details.phone.trim()}\nAddress: ${details.address.trim() || "N/A (Pickup)"}\n\nOrder Type: ${details.orderType}\nPayment Method: ${details.paymentMethod}`;
 
       openWhatsApp("917007835915", message);
-      toast.success("Order placed successfully!");
+      toast.success(`Order placed! Your Order ID: ${generatedOrderId}`, { duration: 10000 });
       setShowForm(false);
       onClear();
     } catch {
