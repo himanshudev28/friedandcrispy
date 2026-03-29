@@ -93,7 +93,7 @@ const AdminOrders = () => {
       completed: `Hello ${order.customer_name},\n\nYour order is ready / completed 🎉\n\nThank you for ordering with us!`,
     };
 
-    window.open(`https://wa.me/${phoneWithCode}?text=${encodeURIComponent(messages[type])}`, "_blank");
+    openWhatsApp(phoneWithCode, messages[type]);
   };
 
   const handleAction = (order: Order, status: "accepted" | "rejected" | "completed") => {
