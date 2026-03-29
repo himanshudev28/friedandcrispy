@@ -194,22 +194,26 @@ const AdminOrders = () => {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex flex-wrap gap-2 pt-2">
-                      {canTransition(order.status, "accepted") && (
-                        <Button size="sm" className="font-body bg-blue-500 hover:bg-blue-600" onClick={() => handleAction(order, "accepted")}>
-                          <Check className="h-4 w-4 mr-1" /> Accept
-                        </Button>
-                      )}
-                      {canTransition(order.status, "rejected") && (
-                        <Button size="sm" variant="destructive" className="font-body" onClick={() => handleAction(order, "rejected")}>
-                          <X className="h-4 w-4 mr-1" /> Reject
-                        </Button>
-                      )}
-                      {canTransition(order.status, "completed") && (
-                        <Button size="sm" className="font-body bg-green-500 hover:bg-green-600" onClick={() => handleAction(order, "completed")}>
-                          <CheckCircle2 className="h-4 w-4 mr-1" /> Complete
-                        </Button>
-                      )}
+                    <div className="flex flex-wrap items-center gap-2 pt-2">
+                      <Select
+                        value={order.status}
+                        onValueChange={(value) => {
+                          updateStatus.mutate({ id: order.id, status: value });
+                          if (value === "accepted" || value === "rejected" || value === "completed") {
+                            sendWhatsApp(order, value);
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-[160px] font-body">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="pending" disabled={order.status !== "pending"}>Pending</SelectItem>
+                          <SelectItem value="accepted" disabled={!canTransition(order.status, "accepted")}>Accepted</SelectItem>
+                          <SelectItem value="completed" disabled={!canTransition(order.status, "completed")}>Completed</SelectItem>
+                          <SelectItem value="rejected" disabled={!canTransition(order.status, "rejected")}>Rejected</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <Button size="sm" variant="outline" className="font-body" onClick={() => {
                         const phone = order.phone.replace(/\D/g, "");
                         const phoneWithCode = phone.startsWith("91") ? phone : `91${phone}`;
