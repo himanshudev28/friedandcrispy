@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { UtensilsCrossed, Star, Clock, MapPin, Phone, Mail, ArrowRight, Flame } from "lucide-react";
+import { UtensilsCrossed, Star, Clock, MapPin, Phone, Mail, ArrowRight, Flame, Menu, X } from "lucide-react";
+import { useState } from "react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
