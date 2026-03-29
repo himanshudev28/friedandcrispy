@@ -10,6 +10,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import CartDrawer from "@/components/menu/CartDrawer";
+import ReviewSection from "@/components/menu/ReviewSection";
 
 const MenuPage = () => {
   const [searchParams] = useSearchParams();
@@ -118,6 +119,7 @@ const MenuPage = () => {
                       <Plus className="h-4 w-4 mr-1" /> Add
                     </Button>
                   </div>
+                  <ReviewSection menuItemId={item.id} itemName={item.name} />
                 </div>
               </motion.div>
             ))}
