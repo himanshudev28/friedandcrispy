@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useSettings } from "@/contexts/SettingsContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -16,6 +17,7 @@ interface ReviewSectionProps {
 }
 
 const ReviewSection = ({ menuItemId, itemName }: ReviewSectionProps) => {
+  const { ratingsEnabled } = useSettings();
   const [open, setOpen] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [name, setName] = useState("");
@@ -65,6 +67,8 @@ const ReviewSection = ({ menuItemId, itemName }: ReviewSectionProps) => {
     if (!comment.trim()) return toast.error("Please add a comment");
     mutation.mutate();
   };
+
+  if (!ratingsEnabled) return null;
 
   return (
     <div className="mt-2">
