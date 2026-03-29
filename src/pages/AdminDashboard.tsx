@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SaleRecord } from "@/types/menu";
@@ -5,14 +6,26 @@ import AdminLayout from "@/components/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { DollarSign, TrendingUp, ShoppingCart, Download, Trash2 } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { DollarSign, TrendingUp, ShoppingCart, Download, Trash2, CalendarIcon, IndianRupee, ChevronLeft, ChevronRight } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
-import { format, subDays, startOfDay, startOfMonth, endOfMonth, eachDayOfInterval } from "date-fns";
+import { format, startOfDay, endOfDay, startOfWeek, endOfWeek, startOfMonth, endOfMonth, startOfYear, endOfYear, eachDayOfInterval, subDays, isWithinInterval } from "date-fns";
+import { cn } from "@/lib/utils";
 import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
+type DatePreset = "today" | "week" | "month" | "year" | "custom";
+
+const ITEMS_PER_PAGE = 10;
+
 const AdminDashboard = () => {
   const queryClient = useQueryClient();
+  const [preset, setPreset] = useState<DatePreset>("today");
+  const [customFrom, setCustomFrom] = useState<Date | undefined>();
+  const [customTo, setCustomTo] = useState<Date | undefined>();
+  const [page, setPage] = useState(1);
+
   const { data: sales = [] } = useQuery({
     queryKey: ["sales"],
     queryFn: async () => {
@@ -33,37 +46,52 @@ const AdminDashboard = () => {
     onError: () => toast.error("Failed to delete sale"),
   });
 
-  const totalRevenue = sales.reduce((sum, s) => sum + s.total, 0);
-  const todaySales = sales.filter((s) => new Date(s.created_at) >= startOfDay(new Date()));
-  const todayRevenue = todaySales.reduce((sum, s) => sum + s.total, 0);
-
-  // Last 7 days chart data
-  const last7Days = eachDayOfInterval({ start: subDays(new Date(), 6), end: new Date() });
-  const dailyData = last7Days.map((day) => {
-    const daySales = sales.filter((s) => format(new Date(s.created_at), "yyyy-MM-dd") === format(day, "yyyy-MM-dd"));
-    return { day: format(day, "EEE"), revenue: daySales.reduce((sum, s) => sum + s.total, 0) };
-  });
-
-  // Monthly trend (last 6 months)
-  const monthlyData = Array.from({ length: 6 }, (_, i) => {
-    const d = new Date();
-    d.setMonth(d.getMonth() - (5 - i));
-    const start = startOfMonth(d);
-    const end = endOfMonth(d);
-    const monthSales = sales.filter((s) => {
-      const date = new Date(s.created_at);
-      return date >= start && date <= end;
-    });
-    return { month: format(d, "MMM"), revenue: monthSales.reduce((sum, s) => sum + s.total, 0) };
-  });
-
-  const exportSales = (period: "daily" | "weekly" | "monthly") => {
-    let filtered = sales;
+  const dateRange = useMemo(() => {
     const now = new Date();
-    if (period === "daily") filtered = sales.filter((s) => new Date(s.created_at) >= startOfDay(now));
-    else if (period === "weekly") filtered = sales.filter((s) => new Date(s.created_at) >= subDays(now, 7));
-    else filtered = sales.filter((s) => new Date(s.created_at) >= startOfMonth(now));
+    switch (preset) {
+      case "today": return { start: startOfDay(now), end: endOfDay(now) };
+      case "week": return { start: startOfWeek(now, { weekStartsOn: 1 }), end: endOfWeek(now, { weekStartsOn: 1 }) };
+      case "month": return { start: startOfMonth(now), end: endOfMonth(now) };
+      case "year": return { start: startOfYear(now), end: endOfYear(now) };
+      case "custom": return {
+        start: customFrom ? startOfDay(customFrom) : startOfDay(now),
+        end: customTo ? endOfDay(customTo) : endOfDay(now),
+      };
+    }
+  }, [preset, customFrom, customTo]);
 
+  const filtered = useMemo(() =>
+    sales.filter((s) => {
+      const d = new Date(s.created_at);
+      return isWithinInterval(d, { start: dateRange.start, end: dateRange.end });
+    }),
+  [sales, dateRange]);
+
+  const totalRevenue = filtered.reduce((sum, s) => sum + s.total, 0);
+  const totalOrders = filtered.length;
+  const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+
+  // Chart: daily breakdown within the range
+  const chartData = useMemo(() => {
+    const days = eachDayOfInterval({ start: dateRange.start, end: dateRange.end });
+    // Limit to last 30 days max for readability
+    const sliced = days.length > 30 ? days.slice(-30) : days;
+    return sliced.map((day) => {
+      const daySales = filtered.filter((s) => format(new Date(s.created_at), "yyyy-MM-dd") === format(day, "yyyy-MM-dd"));
+      return {
+        day: format(day, days.length > 14 ? "dd MMM" : "EEE dd"),
+        revenue: daySales.reduce((sum, s) => sum + s.total, 0),
+        orders: daySales.length,
+      };
+    });
+  }, [filtered, dateRange]);
+
+  // Pagination
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const paginatedSales = filtered.slice((page - 1) * ITEMS_PER_PAGE, page * ITEMS_PER_PAGE);
+
+  const exportFiltered = () => {
+    if (filtered.length === 0) { toast.error("No sales to export"); return; }
     const rows = filtered.map((s) => ({
       Date: format(new Date(s.created_at), "yyyy-MM-dd"),
       Time: format(new Date(s.created_at), "HH:mm"),
@@ -73,19 +101,80 @@ const AdminDashboard = () => {
       Total: s.total.toFixed(2),
       Payment: s.payment_method,
     }));
-
     const ws = XLSX.utils.json_to_sheet(rows);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sales");
-    XLSX.writeFile(wb, `sales_${period}_${format(now, "yyyyMMdd")}.xlsx`);
+    XLSX.writeFile(wb, `sales_${format(dateRange.start, "yyyyMMdd")}_${format(dateRange.end, "yyyyMMdd")}.xlsx`);
+    toast.success("Report exported!");
   };
+
+  const presetButtons: { key: DatePreset; label: string }[] = [
+    { key: "today", label: "Today" },
+    { key: "week", label: "This Week" },
+    { key: "month", label: "This Month" },
+    { key: "year", label: "This Year" },
+    { key: "custom", label: "Custom" },
+  ];
+
+  // Reset page when filters change
+  const handlePreset = (p: DatePreset) => { setPreset(p); setPage(1); };
 
   return (
     <AdminLayout>
-      <div className="p-6 space-y-6">
-        <div>
-          <h1 className="text-3xl font-display font-bold">Dashboard</h1>
-          <p className="text-muted-foreground font-body">Overview of your restaurant performance</p>
+      <div className="p-4 md:p-6 space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-display font-bold">Dashboard</h1>
+            <p className="text-muted-foreground font-body text-sm">
+              {format(dateRange.start, "MMM dd, yyyy")} — {format(dateRange.end, "MMM dd, yyyy")}
+            </p>
+          </div>
+          <Button variant="outline" className="font-body" onClick={exportFiltered}>
+            <Download className="h-4 w-4 mr-2" /> Export Excel
+          </Button>
+        </div>
+
+        {/* Date Filters */}
+        <div className="flex flex-wrap items-center gap-2">
+          {presetButtons.map((b) => (
+            <Button
+              key={b.key}
+              variant={preset === b.key ? "default" : "outline"}
+              size="sm"
+              className="font-body rounded-full"
+              onClick={() => handlePreset(b.key)}
+            >
+              {b.label}
+            </Button>
+          ))}
+
+          {preset === "custom" && (
+            <div className="flex items-center gap-2 ml-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className={cn("font-body", !customFrom && "text-muted-foreground")}>
+                    <CalendarIcon className="h-4 w-4 mr-1" />
+                    {customFrom ? format(customFrom, "MMM dd, yyyy") : "From"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={customFrom} onSelect={(d) => { setCustomFrom(d); setPage(1); }} initialFocus className="p-3 pointer-events-auto" />
+                </PopoverContent>
+              </Popover>
+              <span className="text-muted-foreground text-sm">→</span>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" size="sm" className={cn("font-body", !customTo && "text-muted-foreground")}>
+                    <CalendarIcon className="h-4 w-4 mr-1" />
+                    {customTo ? format(customTo, "MMM dd, yyyy") : "To"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar mode="single" selected={customTo} onSelect={(d) => { setCustomTo(d); setPage(1); }} initialFocus className="p-3 pointer-events-auto" />
+                </PopoverContent>
+              </Popover>
+            </div>
+          )}
         </div>
 
         {/* Metrics */}
@@ -98,20 +187,7 @@ const AdminDashboard = () => {
                   <p className="text-2xl font-bold font-display">₹{totalRevenue.toFixed(2)}</p>
                 </div>
                 <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <DollarSign className="h-5 w-5 text-primary" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground font-body">Today's Sales</p>
-                  <p className="text-2xl font-bold font-display">₹{todayRevenue.toFixed(2)}</p>
-                </div>
-                <div className="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-accent" />
+                  <IndianRupee className="h-5 w-5 text-primary" />
                 </div>
               </div>
             </CardContent>
@@ -121,10 +197,23 @@ const AdminDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground font-body">Total Orders</p>
-                  <p className="text-2xl font-bold font-display">{sales.length}</p>
+                  <p className="text-2xl font-bold font-display">{totalOrders}</p>
+                </div>
+                <div className="h-10 w-10 rounded-full bg-accent/10 flex items-center justify-center">
+                  <ShoppingCart className="h-5 w-5 text-accent" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground font-body">Avg. Order Value</p>
+                  <p className="text-2xl font-bold font-display">₹{avgOrderValue.toFixed(2)}</p>
                 </div>
                 <div className="h-10 w-10 rounded-full bg-success/10 flex items-center justify-center">
-                  <ShoppingCart className="h-5 w-5 text-success" />
+                  <TrendingUp className="h-5 w-5 text-success" />
                 </div>
               </div>
             </CardContent>
@@ -134,104 +223,126 @@ const AdminDashboard = () => {
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-display">Last 7 Days</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-lg font-display">Daily Revenue</CardTitle></CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={dailyData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
-                  <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              {chartData.length === 0 ? (
+                <p className="text-muted-foreground text-center py-12 font-body">No data for this period</p>
+              ) : (
+                <ResponsiveContainer width="100%" height={260}>
+                  <BarChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={11} angle={-30} textAnchor="end" height={50} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
+                    <Bar dataKey="revenue" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} name="Revenue (₹)" />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
             </CardContent>
           </Card>
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg font-display">Monthly Trends</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-lg font-display">Orders Trend</CardTitle></CardHeader>
             <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                  <XAxis dataKey="month" stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} />
-                  <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
-                  <Line type="monotone" dataKey="revenue" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ fill: "hsl(var(--primary))" }} />
-                </LineChart>
-              </ResponsiveContainer>
+              {chartData.length === 0 ? (
+                <p className="text-muted-foreground text-center py-12 font-body">No data for this period</p>
+              ) : (
+                <ResponsiveContainer width="100%" height={260}>
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                    <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={11} angle={-30} textAnchor="end" height={50} />
+                    <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} allowDecimals={false} />
+                    <Tooltip contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }} />
+                    <Line type="monotone" dataKey="orders" stroke="hsl(var(--accent))" strokeWidth={2} dot={{ fill: "hsl(var(--accent))" }} name="Orders" />
+                  </LineChart>
+                </ResponsiveContainer>
+              )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Export Buttons */}
+        {/* Recent Sales with Pagination */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-display">Export Sales Report</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg font-display">Sales ({filtered.length})</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-3">
-              <Button variant="outline" className="font-body" onClick={() => exportSales("daily")}>
-                <Download className="h-4 w-4 mr-2" /> Daily Report
-              </Button>
-              <Button variant="outline" className="font-body" onClick={() => exportSales("weekly")}>
-                <Download className="h-4 w-4 mr-2" /> Weekly Report
-              </Button>
-              <Button variant="outline" className="font-body" onClick={() => exportSales("monthly")}>
-                <Download className="h-4 w-4 mr-2" /> Monthly Report
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Recent Sales */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg font-display">Recent Sales</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {sales.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8 font-body">No sales yet</p>
+            {filtered.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8 font-body">No sales in this period</p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="font-body">Date</TableHead>
-                    <TableHead className="font-body">Time</TableHead>
-                    <TableHead className="font-body">Items</TableHead>
-                    <TableHead className="font-body">Total</TableHead>
-                    <TableHead className="font-body">Payment</TableHead>
-                    <TableHead className="font-body text-right">Action</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sales.slice(0, 20).map((sale) => (
-                    <TableRow key={sale.id}>
-                      <TableCell className="font-body">{format(new Date(sale.created_at), "MMM dd, yyyy")}</TableCell>
-                      <TableCell className="font-body">{format(new Date(sale.created_at), "HH:mm")}</TableCell>
-                      <TableCell className="font-body text-sm max-w-[200px] truncate">
-                        {(sale.items as any[]).map((i: any) => `${i.name} x${i.quantity}`).join(", ")}
-                      </TableCell>
-                      <TableCell className="font-bold font-body">₹{sale.total.toFixed(2)}</TableCell>
-                      <TableCell>
-                        <span className={`text-xs px-2 py-1 rounded-full font-body ${
-                          sale.payment_method === "Cash" ? "bg-success/10 text-success" : "bg-primary/10 text-primary"
-                        }`}>
-                          {sale.payment_method}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => deleteSale.mutate(sale.id)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="font-body">Date</TableHead>
+                        <TableHead className="font-body">Time</TableHead>
+                        <TableHead className="font-body">Items</TableHead>
+                        <TableHead className="font-body">Total</TableHead>
+                        <TableHead className="font-body">Payment</TableHead>
+                        <TableHead className="font-body text-right">Action</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {paginatedSales.map((sale) => (
+                        <TableRow key={sale.id}>
+                          <TableCell className="font-body whitespace-nowrap">{format(new Date(sale.created_at), "MMM dd, yyyy")}</TableCell>
+                          <TableCell className="font-body">{format(new Date(sale.created_at), "HH:mm")}</TableCell>
+                          <TableCell className="font-body text-sm max-w-[200px] truncate">
+                            {(sale.items as any[]).map((i: any) => `${i.name} x${i.quantity}`).join(", ")}
+                          </TableCell>
+                          <TableCell className="font-bold font-body">₹{sale.total.toFixed(2)}</TableCell>
+                          <TableCell>
+                            <span className={`text-xs px-2 py-1 rounded-full font-body ${
+                              sale.payment_method === "Cash" ? "bg-success/10 text-success" : "bg-primary/10 text-primary"
+                            }`}>
+                              {sale.payment_method}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => deleteSale.mutate(sale.id)}>
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t">
+                    <Button variant="outline" size="icon" className="h-8 w-8" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                      .filter((p) => p === 1 || p === totalPages || Math.abs(p - page) <= 2)
+                      .reduce<(number | "...")[]>((acc, p, i, arr) => {
+                        if (i > 0 && p - (arr[i - 1]) > 1) acc.push("...");
+                        acc.push(p);
+                        return acc;
+                      }, [])
+                      .map((p, i) =>
+                        p === "..." ? (
+                          <span key={`dot-${i}`} className="px-1 text-muted-foreground text-sm">…</span>
+                        ) : (
+                          <Button
+                            key={p}
+                            variant={page === p ? "default" : "outline"}
+                            size="sm"
+                            className="h-8 w-8 p-0 font-body"
+                            onClick={() => setPage(p as number)}
+                          >
+                            {p}
+                          </Button>
+                        )
+                      )}
+                    <Button variant="outline" size="icon" className="h-8 w-8" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>
