@@ -131,7 +131,7 @@ const AdminMenuManager = () => {
                   <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
                     <SelectTrigger className="font-body"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {CATEGORIES.map((c) => <SelectItem key={c} value={c} className="font-body">{c}</SelectItem>)}
+                      {categories.map((c) => <SelectItem key={c} value={c} className="font-body">{c}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>
