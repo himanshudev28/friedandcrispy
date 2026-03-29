@@ -10,6 +10,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminMenuManager from "./pages/AdminMenuManager";
 import AdminCategories from "./pages/AdminCategories";
+import AdminOrders from "./pages/AdminOrders";
 import POSPage from "./pages/POSPage";
 import NotFound from "./pages/NotFound";
 
