@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/menu", label: "Menu Manager", icon: BookOpen },
+  { to: "/admin/categories", label: "Categories", icon: Tags },
   { to: "/admin/pos", label: "POS Billing", icon: ShoppingCart },
 ];
 
