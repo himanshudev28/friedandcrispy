@@ -68,6 +68,8 @@ const ReviewSection = ({ menuItemId, itemName }: ReviewSectionProps) => {
     mutation.mutate();
   };
 
+  if (!ratingsEnabled) return null;
+
   return (
     <div className="mt-2">
       <div className="flex items-center gap-2">
