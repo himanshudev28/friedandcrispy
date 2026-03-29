@@ -119,6 +119,7 @@ const MenuPage = () => {
                       <Plus className="h-4 w-4 mr-1" /> Add
                     </Button>
                   </div>
+                  <ReviewSection menuItemId={item.id} itemName={item.name} />
                 </div>
               </motion.div>
             ))}
