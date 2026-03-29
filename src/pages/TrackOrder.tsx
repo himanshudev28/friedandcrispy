@@ -41,10 +41,10 @@ const TrackOrder = () => {
   const fetchOrder = async (id: string) => {
     setLoading(true);
     setSearched(true);
-    const { data } = await supabase
+    const { data } = await (supabase
       .from("orders")
-      .select("*")
-      .eq("order_id" as any, id.trim().toUpperCase())
+      .select("*") as any)
+      .eq("order_id", id.trim().toUpperCase())
       .maybeSingle();
     setOrder(data);
     setLoading(false);
