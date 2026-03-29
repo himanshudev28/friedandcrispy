@@ -2,17 +2,20 @@ import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { MenuItem } from "@/types/menu";
+import { MenuItem, CartItem } from "@/types/menu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { UtensilsCrossed, Search, ArrowLeft } from "lucide-react";
+import { UtensilsCrossed, Search, ArrowLeft, Plus } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
+import CartDrawer from "@/components/menu/CartDrawer";
 
 const MenuPage = () => {
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "All";
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [search, setSearch] = useState("");
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["menu"],
@@ -30,6 +33,24 @@ const MenuPage = () => {
     return matchCat && matchSearch;
   });
 
+  const addToCart = (item: MenuItem) => {
+    setCart((prev) => {
+      const existing = prev.find((c) => c.id === item.id);
+      if (existing) return prev.map((c) => (c.id === item.id ? { ...c, quantity: c.quantity + 1 } : c));
+      return [...prev, { ...item, quantity: 1 }];
+    });
+    toast.success(`${item.name} added to cart`);
+  };
+
+  const updateQty = (id: string, delta: number) => {
+    setCart((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, quantity: Math.max(0, c.quantity + delta) } : c)).filter((c) => c.quantity > 0)
+    );
+  };
+
+  const removeFromCart = (id: string) => setCart((prev) => prev.filter((c) => c.id !== id));
+  const clearCart = () => setCart([]);
+
   return (
     <div className="min-h-screen bg-background">
       <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b">
@@ -42,7 +63,7 @@ const MenuPage = () => {
         </div>
       </nav>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pb-24">
         <h1 className="text-4xl font-display font-bold mb-2">Our Menu</h1>
         <p className="text-muted-foreground font-body mb-8">Discover flavors crafted with passion</p>
 
@@ -89,13 +110,20 @@ const MenuPage = () => {
                 <div className="p-4">
                   <span className="text-xs font-semibold text-primary uppercase tracking-wider font-body">{item.category}</span>
                   <h3 className="font-display font-semibold text-lg mt-1">{item.name}</h3>
-                  <p className="text-xl font-bold text-primary mt-2 font-body">₹{item.price.toFixed(2)}</p>
+                  <div className="flex items-center justify-between mt-2">
+                    <p className="text-xl font-bold text-primary font-body">₹{item.price.toFixed(2)}</p>
+                    <Button size="sm" className="rounded-full font-body" onClick={() => addToCart(item)}>
+                      <Plus className="h-4 w-4 mr-1" /> Add
+                    </Button>
+                  </div>
                 </div>
               </motion.div>
             ))}
           </div>
         )}
       </div>
+
+      <CartDrawer cart={cart} onUpdateQty={updateQty} onRemove={removeFromCart} onClear={clearCart} />
     </div>
   );
 };
