@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { UtensilsCrossed, Star, Clock, MapPin, Phone, Mail, ArrowRight, Flame } from "lucide-react";
+import ThemeToggle from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { MenuItem } from "@/types/menu";
@@ -54,7 +55,8 @@ const Index = () => {
             <Flame className="h-7 w-7 text-primary group-hover:scale-110 transition-transform" />
             <span className="text-xl font-display font-bold text-foreground">Fried&Crispy</span>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Link to="/menu">
               <Button variant="ghost" className="font-body hidden sm:inline-flex">Menu</Button>
             </Link>
@@ -118,7 +120,7 @@ const Index = () => {
                 </Button>
               </Link>
               <a href="tel:+917007835915">
-                <Button size="lg" variant="outline" className="text-lg px-8 py-6 rounded-full font-body border-white/20 text-white hover:bg-white/10 backdrop-blur-sm">
+                <Button size="lg" variant="outline" className="text-lg px-8 py-6 rounded-full font-body border-primary/50 text-primary-foreground bg-primary/20 hover:bg-primary/30 backdrop-blur-sm">
                   <Phone className="h-5 w-5 mr-2" /> Call Us
                 </Button>
               </a>
