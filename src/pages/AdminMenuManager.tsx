@@ -86,7 +86,7 @@ const AdminMenuManager = () => {
 
   const openAdd = () => {
     setEditItem(null);
-    setForm({ name: "", price: "", category: CATEGORIES[0], imageFile: null });
+    setForm({ name: "", price: "", category: categories[0] || "", imageFile: null });
     setDialogOpen(true);
   };
 
