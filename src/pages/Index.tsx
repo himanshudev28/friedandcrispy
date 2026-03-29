@@ -57,8 +57,14 @@ const Index = () => {
           </Link>
           <div className="flex items-center gap-2">
             <ThemeToggle />
+            <Link to="/track">
+              <Button variant="ghost" className="font-body hidden sm:inline-flex">Track Order</Button>
+            </Link>
             <Link to="/menu">
               <Button variant="ghost" className="font-body hidden sm:inline-flex">Menu</Button>
+            </Link>
+            <Link to="/admin">
+              <Button variant="outline" className="font-body hidden sm:inline-flex">Admin</Button>
             </Link>
             <Link to="/menu">
               <Button className="font-body rounded-full px-5 shadow-md">
