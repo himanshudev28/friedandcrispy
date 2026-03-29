@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { CartItem } from "@/types/menu";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,6 +30,7 @@ const STORAGE_KEY = "fc_customer_details";
 
 const CartDrawer = ({ cart, onUpdateQty, onRemove, onClear }: CartDrawerProps) => {
   const [showForm, setShowForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [details, setDetails] = useState<CustomerDetails>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -53,11 +55,27 @@ const CartDrawer = ({ cart, onUpdateQty, onRemove, onClear }: CartDrawerProps) =
     return true;
   };
 
-  const sendToWhatsApp = () => {
+  const placeOrder = async () => {
     if (!validate()) return;
+    setSubmitting(true);
 
-    const itemLines = cart.map(c => `- ${c.name} x${c.quantity} = ₹${(c.price * c.quantity).toFixed(2)}`).join("\n");
-    const message = `New Order 🧾
+    try {
+      // Save to database
+      const { error } = await supabase.from("orders").insert({
+        items: cart.map(c => ({ id: c.id, name: c.name, price: c.price, quantity: c.quantity })) as any,
+        total,
+        customer_name: details.name.trim(),
+        phone: details.phone.trim(),
+        address: details.address.trim() || "",
+        order_type: details.orderType,
+        payment_method: details.paymentMethod,
+        status: "pending",
+      });
+      if (error) throw error;
+
+      // Send WhatsApp notification
+      const itemLines = cart.map(c => `- ${c.name} x${c.quantity} = ₹${(c.price * c.quantity).toFixed(2)}`).join("\n");
+      const message = `New Order 🚨
 
 Items:
 ${itemLines}
@@ -72,11 +90,15 @@ Address: ${details.address.trim() || "N/A (Pickup)"}
 Order Type: ${details.orderType}
 Payment Method: ${details.paymentMethod}`;
 
-    const url = `https://wa.me/917007835915?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank");
-    toast.success("Redirecting to WhatsApp...");
-    setShowForm(false);
-    onClear();
+      window.open(`https://wa.me/917007835915?text=${encodeURIComponent(message)}`, "_blank");
+      toast.success("Order placed successfully!");
+      setShowForm(false);
+      onClear();
+    } catch {
+      toast.error("Failed to place order. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -137,7 +159,7 @@ Payment Method: ${details.paymentMethod}`;
                     <X className="h-4 w-4 mr-1" /> Clear
                   </Button>
                   <Button className="flex-1 font-body" onClick={() => setShowForm(true)}>
-                    <Send className="h-4 w-4 mr-2" /> Order on WhatsApp
+                    <Send className="h-4 w-4 mr-2" /> Place Order
                   </Button>
                 </div>
               </div>
@@ -152,7 +174,6 @@ Payment Method: ${details.paymentMethod}`;
             <DialogTitle className="font-display">Complete Your Order</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            {/* Order Summary */}
             <div className="bg-muted/50 rounded-lg p-3 space-y-1 text-sm font-body">
               {cart.map(c => (
                 <div key={c.id} className="flex justify-between">
@@ -210,8 +231,8 @@ Payment Method: ${details.paymentMethod}`;
               </div>
             </div>
 
-            <Button className="w-full font-body" size="lg" onClick={sendToWhatsApp}>
-              <Send className="h-4 w-4 mr-2" /> Send Order to WhatsApp
+            <Button className="w-full font-body" size="lg" onClick={placeOrder} disabled={submitting}>
+              <Send className="h-4 w-4 mr-2" /> {submitting ? "Placing Order..." : "Send Order to WhatsApp"}
             </Button>
           </div>
         </DialogContent>
