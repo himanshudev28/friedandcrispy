@@ -61,6 +61,7 @@ const MenuPage = () => {
             <UtensilsCrossed className="h-6 w-6 text-primary" />
             <span className="text-xl font-display font-bold">Fried&Crispy</span>
           </Link>
+          <ThemeToggle />
         </div>
       </nav>
 
