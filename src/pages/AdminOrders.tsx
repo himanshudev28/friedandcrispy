@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { openWhatsApp } from "@/lib/whatsapp";
 import { Check, X, CheckCircle2, MessageCircle, Trash2, Clock, Package } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect } from "react";
@@ -92,7 +93,7 @@ const AdminOrders = () => {
       completed: `Hello ${order.customer_name},\n\nYour order is ready / completed 🎉\n\nThank you for ordering with us!`,
     };
 
-    window.open(`https://wa.me/${phoneWithCode}?text=${encodeURIComponent(messages[type])}`, "_blank");
+    openWhatsApp(phoneWithCode, messages[type]);
   };
 
   const handleAction = (order: Order, status: "accepted" | "rejected" | "completed") => {
@@ -209,7 +210,7 @@ const AdminOrders = () => {
                       <Button size="sm" variant="outline" className="font-body" onClick={() => {
                         const phone = order.phone.replace(/\D/g, "");
                         const phoneWithCode = phone.startsWith("91") ? phone : `91${phone}`;
-                        window.open(`https://wa.me/${phoneWithCode}`, "_blank");
+                        openWhatsApp(phoneWithCode, "");
                       }}>
                         <MessageCircle className="h-4 w-4 mr-1" /> WhatsApp
                       </Button>

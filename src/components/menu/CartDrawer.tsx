@@ -3,6 +3,7 @@ import { CartItem } from "@/types/menu";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { openWhatsApp } from "@/lib/whatsapp";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
@@ -90,7 +91,7 @@ Address: ${details.address.trim() || "N/A (Pickup)"}
 Order Type: ${details.orderType}
 Payment Method: ${details.paymentMethod}`;
 
-      window.open(`https://wa.me/917007835915?text=${encodeURIComponent(message)}`, "_blank");
+      openWhatsApp("917007835915", message);
       toast.success("Order placed successfully!");
       setShowForm(false);
       onClear();
