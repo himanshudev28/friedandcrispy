@@ -40,3 +40,11 @@
 .read-the-docs {
   color: #888;
 }
+
+iframe[src*="lovable"],
+a[href*="lovable"],
+div[id*="lovable"],
+div[class*="lovable"] {
+  display: none !important;
+  visibility: hidden !important;
+}
