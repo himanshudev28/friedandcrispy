@@ -118,7 +118,7 @@ const Index = () => {
                 </Button>
               </Link>
               <a href="tel:+917007835915">
-                <Button size="lg" variant="outline" className="text-lg px-8 py-6 rounded-full font-body border-white/20 text-white hover:bg-white/10 backdrop-blur-sm">
+                <Button size="lg" variant="outline" className="text-lg px-8 py-6 rounded-full font-body border-primary/50 text-primary-foreground bg-primary/20 hover:bg-primary/30 backdrop-blur-sm">
                   <Phone className="h-5 w-5 mr-2" /> Call Us
                 </Button>
               </a>
