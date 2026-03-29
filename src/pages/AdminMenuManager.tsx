@@ -13,13 +13,19 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Pencil, Trash2, UtensilsCrossed, Upload } from "lucide-react";
 import { toast } from "sonner";
 
-const CATEGORIES = ["Burgers", "Pizza", "Drinks", "Desserts", "Sides", "Combos"];
-
 const AdminMenuManager = () => {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editItem, setEditItem] = useState<MenuItem | null>(null);
-  const [form, setForm] = useState({ name: "", price: "", category: CATEGORIES[0], imageFile: null as File | null });
+  const [form, setForm] = useState({ name: "", price: "", category: "", imageFile: null as File | null });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data } = await supabase.from("categories").select("name").order("name");
+      return (data?.map((c: any) => c.name) as string[]) || [];
+    },
+  });
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["menu"],
@@ -80,7 +86,7 @@ const AdminMenuManager = () => {
 
   const openAdd = () => {
     setEditItem(null);
-    setForm({ name: "", price: "", category: CATEGORIES[0], imageFile: null });
+    setForm({ name: "", price: "", category: categories[0] || "", imageFile: null });
     setDialogOpen(true);
   };
 
@@ -125,7 +131,7 @@ const AdminMenuManager = () => {
                   <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
                     <SelectTrigger className="font-body"><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      {CATEGORIES.map((c) => <SelectItem key={c} value={c} className="font-body">{c}</SelectItem>)}
+                      {categories.map((c) => <SelectItem key={c} value={c} className="font-body">{c}</SelectItem>)}
                     </SelectContent>
                   </Select>
                 </div>

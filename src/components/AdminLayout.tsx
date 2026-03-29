@@ -2,12 +2,13 @@ import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Button } from "@/components/ui/button";
-import { UtensilsCrossed, LayoutDashboard, BookOpen, ShoppingCart, LogOut } from "lucide-react";
+import { UtensilsCrossed, LayoutDashboard, BookOpen, ShoppingCart, LogOut, Tags } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/admin/menu", label: "Menu Manager", icon: BookOpen },
+  { to: "/admin/categories", label: "Categories", icon: Tags },
   { to: "/admin/pos", label: "POS Billing", icon: ShoppingCart },
 ];
 
