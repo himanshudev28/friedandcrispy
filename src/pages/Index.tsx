@@ -64,7 +64,7 @@ const Index = () => {
               <Button variant="ghost" className="font-body hidden sm:inline-flex text-foreground hover:text-foreground">Menu</Button>
             </Link>
             <Link to="/admin">
-              <Button variant="outline" className="font-body hidden sm:inline-flex border-border text-foreground">Admin</Button>
+              <Button variant="ghost" className="font-body hidden sm:inline-flex text-foreground hover:text-foreground">Admin</Button>
             </Link>
             <Link to="/menu">
               <Button className="font-body rounded-full px-5 shadow-md">
