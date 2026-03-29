@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { UtensilsCrossed, Star, Clock, MapPin, Phone, Mail, ArrowRight, Flame } from "lucide-react";
+import { UtensilsCrossed, Star, Clock, MapPin, Phone, Mail, ArrowRight, Flame, Menu, X } from "lucide-react";
+import { useState } from "react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
@@ -19,6 +20,7 @@ const scaleIn = {
 };
 
 const Index = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.15], [1, 1.1]);
@@ -55,16 +57,18 @@ const Index = () => {
             <Flame className="h-7 w-7 text-primary group-hover:scale-110 transition-transform" />
             <span className="text-xl font-display font-bold text-foreground">Fried&Crispy</span>
           </Link>
-          <div className="flex items-center gap-2">
+
+          {/* Desktop nav */}
+          <div className="hidden sm:flex items-center gap-2">
             <ThemeToggle />
             <Link to="/track">
-              <Button variant="ghost" size="sm" className="font-body text-foreground hover:text-foreground text-xs sm:text-sm">Track</Button>
+              <Button variant="ghost" className="font-body text-foreground hover:text-foreground">Track Order</Button>
             </Link>
             <Link to="/menu">
-              <Button variant="ghost" size="sm" className="font-body hidden sm:inline-flex text-foreground hover:text-foreground">Menu</Button>
+              <Button variant="ghost" className="font-body text-foreground hover:text-foreground">Menu</Button>
             </Link>
             <Link to="/admin">
-              <Button variant="ghost" size="sm" className="font-body text-foreground hover:text-foreground text-xs sm:text-sm">Admin</Button>
+              <Button variant="ghost" className="font-body text-foreground hover:text-foreground">Admin</Button>
             </Link>
             <Link to="/menu">
               <Button className="font-body rounded-full px-5 shadow-md">
@@ -72,7 +76,40 @@ const Index = () => {
               </Button>
             </Link>
           </div>
+
+          {/* Mobile hamburger */}
+          <div className="flex sm:hidden items-center gap-2">
+            <ThemeToggle />
+            <Button variant="ghost" size="icon" className="text-foreground" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
         </div>
+
+        {/* Mobile dropdown */}
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="sm:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 px-4 pb-4 space-y-2"
+          >
+            <Link to="/track" onClick={() => setMobileMenuOpen(false)}>
+              <Button variant="ghost" className="w-full justify-start font-body text-foreground">Track Order</Button>
+            </Link>
+            <Link to="/menu" onClick={() => setMobileMenuOpen(false)}>
+              <Button variant="ghost" className="w-full justify-start font-body text-foreground">Menu</Button>
+            </Link>
+            <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
+              <Button variant="ghost" className="w-full justify-start font-body text-foreground">Admin</Button>
+            </Link>
+            <Link to="/menu" onClick={() => setMobileMenuOpen(false)}>
+              <Button className="w-full font-body rounded-full shadow-md">
+                Order Now <ArrowRight className="h-4 w-4 ml-1" />
+              </Button>
+            </Link>
+          </motion.div>
+        )}
       </nav>
 
       {/* Hero Section */}
