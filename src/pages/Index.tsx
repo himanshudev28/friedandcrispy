@@ -55,7 +55,8 @@ const Index = () => {
             <Flame className="h-7 w-7 text-primary group-hover:scale-110 transition-transform" />
             <span className="text-xl font-display font-bold text-foreground">Fried&Crispy</span>
           </Link>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             <Link to="/menu">
               <Button variant="ghost" className="font-body hidden sm:inline-flex">Menu</Button>
             </Link>
