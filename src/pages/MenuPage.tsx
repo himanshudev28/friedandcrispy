@@ -10,6 +10,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import CartDrawer from "@/components/menu/CartDrawer";
+import ReviewSection from "@/components/menu/ReviewSection";
 
 const MenuPage = () => {
   const [searchParams] = useSearchParams();
