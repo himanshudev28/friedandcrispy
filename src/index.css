@@ -106,3 +106,8 @@ div[class*="lovable"] {
   display: none !important;
   visibility: hidden !important;
 }
+
+#lovable-badge-cta,
+#lovable-badge-text {
+  display: none !important;
+}
