@@ -44,7 +44,7 @@ const TrackOrder = () => {
     const { data } = await supabase
       .from("orders")
       .select("*")
-      .eq("order_id", id.trim().toUpperCase())
+      .eq("order_id" as any, id.trim().toUpperCase())
       .maybeSingle();
     setOrder(data);
     setLoading(false);

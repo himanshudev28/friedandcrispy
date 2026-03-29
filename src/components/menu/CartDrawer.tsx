@@ -71,10 +71,10 @@ const CartDrawer = ({ cart, onUpdateQty, onRemove, onClear }: CartDrawerProps) =
         order_type: details.orderType,
         payment_method: details.paymentMethod,
         status: "pending",
-      }).select("order_id").single();
+      }).select().single();
       if (error) throw error;
 
-      const generatedOrderId = orderData?.order_id || "N/A";
+      const generatedOrderId = (orderData as any)?.order_id || "N/A";
       localStorage.setItem("lastOrderId", generatedOrderId);
 
       // Send WhatsApp notification
