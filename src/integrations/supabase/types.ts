@@ -98,6 +98,41 @@ export type Database = {
         }
         Relationships: []
       }
+      reviews: {
+        Row: {
+          comment: string
+          created_at: string
+          id: string
+          menu_item_id: string
+          name: string
+          rating: number
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          id?: string
+          menu_item_id: string
+          name?: string
+          rating: number
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          id?: string
+          menu_item_id?: string
+          name?: string
+          rating?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sales: {
         Row: {
           created_at: string
