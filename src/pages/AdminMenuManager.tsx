@@ -17,7 +17,15 @@ const AdminMenuManager = () => {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editItem, setEditItem] = useState<MenuItem | null>(null);
-  const [form, setForm] = useState({ name: "", price: "", category: CATEGORIES[0], imageFile: null as File | null });
+  const [form, setForm] = useState({ name: "", price: "", category: "", imageFile: null as File | null });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data } = await supabase.from("categories").select("name").order("name");
+      return (data?.map((c: any) => c.name) as string[]) || [];
+    },
+  });
 
   const { data: items = [], isLoading } = useQuery({
     queryKey: ["menu"],
