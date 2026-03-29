@@ -17,6 +17,7 @@ interface ReviewSectionProps {
 }
 
 const ReviewSection = ({ menuItemId, itemName }: ReviewSectionProps) => {
+  const { ratingsEnabled } = useSettings();
   const [open, setOpen] = useState(false);
   const [showReviews, setShowReviews] = useState(false);
   const [name, setName] = useState("");
