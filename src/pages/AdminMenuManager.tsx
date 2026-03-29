@@ -13,8 +13,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Pencil, Trash2, UtensilsCrossed, Upload } from "lucide-react";
 import { toast } from "sonner";
 
-const CATEGORIES = ["Burgers", "Pizza", "Drinks", "Desserts", "Sides", "Combos"];
-
 const AdminMenuManager = () => {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
