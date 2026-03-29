@@ -19,6 +19,7 @@ interface OrderItem {
 
 interface Order {
   id: string;
+  order_id: string | null;
   items: OrderItem[];
   total: number;
   customer_name: string;
