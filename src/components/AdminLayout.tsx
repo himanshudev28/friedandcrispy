@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Button } from "@/components/ui/button";
-import { UtensilsCrossed, LayoutDashboard, BookOpen, ShoppingCart, LogOut, Tags, ClipboardList } from "lucide-react";
+import { UtensilsCrossed, LayoutDashboard, BookOpen, ShoppingCart, LogOut, Tags, ClipboardList, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -11,6 +11,7 @@ const navItems = [
   { to: "/admin/categories", label: "Categories", icon: Tags },
   { to: "/admin/orders", label: "Orders", icon: ClipboardList },
   { to: "/admin/pos", label: "POS Billing", icon: ShoppingCart },
+  { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 const AdminLayout = ({ children }: { children: ReactNode }) => {
