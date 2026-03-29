@@ -210,7 +210,7 @@ const AdminOrders = () => {
                       <Button size="sm" variant="outline" className="font-body" onClick={() => {
                         const phone = order.phone.replace(/\D/g, "");
                         const phoneWithCode = phone.startsWith("91") ? phone : `91${phone}`;
-                        window.open(`https://wa.me/${phoneWithCode}`, "_blank");
+                        openWhatsApp(phoneWithCode, "");
                       }}>
                         <MessageCircle className="h-4 w-4 mr-1" /> WhatsApp
                       </Button>
