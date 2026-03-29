@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAdmin } from "@/contexts/AdminContext";
 import { Button } from "@/components/ui/button";
-import { UtensilsCrossed, LayoutDashboard, BookOpen, ShoppingCart, LogOut, Tags } from "lucide-react";
+import { UtensilsCrossed, LayoutDashboard, BookOpen, ShoppingCart, LogOut, Tags, ClipboardList } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
