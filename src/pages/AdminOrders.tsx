@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { openWhatsApp } from "@/lib/whatsapp";
 import { Check, X, CheckCircle2, MessageCircle, Trash2, Clock, Package } from "lucide-react";
 import { toast } from "sonner";
 import { useEffect } from "react";
