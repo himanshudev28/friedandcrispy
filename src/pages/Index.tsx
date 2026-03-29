@@ -92,19 +92,19 @@ const Index = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="sm:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 px-4 pb-4 space-y-2"
+            className="sm:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 px-4 py-3 space-y-1"
           >
             <Link to="/track" onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start font-body text-foreground">Track Order</Button>
+              <Button variant="ghost" size="sm" className="w-full justify-start font-body text-foreground text-sm h-9">Track Order</Button>
             </Link>
             <Link to="/menu" onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start font-body text-foreground">Menu</Button>
+              <Button variant="ghost" size="sm" className="w-full justify-start font-body text-foreground text-sm h-9">Menu</Button>
             </Link>
             <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start font-body text-foreground">Admin</Button>
+              <Button variant="ghost" size="sm" className="w-full justify-start font-body text-foreground text-sm h-9">Admin</Button>
             </Link>
             <Link to="/menu" onClick={() => setMobileMenuOpen(false)}>
-              <Button className="w-full font-body rounded-full shadow-md">
+              <Button size="sm" className="w-full font-body rounded-full shadow-md mt-1 h-9">
                 Order Now <ArrowRight className="h-4 w-4 ml-1" />
               </Button>
             </Link>
