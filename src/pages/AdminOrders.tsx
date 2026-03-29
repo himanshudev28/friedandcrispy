@@ -143,6 +143,7 @@ const AdminOrders = () => {
                     <div className="flex items-start justify-between">
                       <div>
                         <CardTitle className="font-display text-lg">{order.customer_name}</CardTitle>
+                        <p className="text-sm font-semibold text-primary font-body">{order.order_id || "—"}</p>
                         <p className="text-sm text-muted-foreground font-body mt-1">
                           {new Date(order.created_at).toLocaleString("en-IN")}
                         </p>
