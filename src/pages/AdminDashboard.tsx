@@ -16,6 +16,7 @@ import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
 type DatePreset = "today" | "week" | "month" | "year" | "custom";
+type PaymentFilter = "all" | "Cash" | "Online";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -25,6 +26,7 @@ const AdminDashboard = () => {
   const [customFrom, setCustomFrom] = useState<Date | undefined>();
   const [customTo, setCustomTo] = useState<Date | undefined>();
   const [page, setPage] = useState(1);
+  const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("all");
 
   const { data: sales = [] } = useQuery({
     queryKey: ["sales"],
