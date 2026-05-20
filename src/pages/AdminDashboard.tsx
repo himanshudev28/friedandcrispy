@@ -122,6 +122,13 @@ const AdminDashboard = () => {
 
   // Reset page when filters change
   const handlePreset = (p: DatePreset) => { setPreset(p); setPage(1); };
+  const handlePaymentFilter = (p: PaymentFilter) => { setPaymentFilter(p); setPage(1); };
+
+  const paymentButtons: { key: PaymentFilter; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "Cash", label: "Cash" },
+    { key: "Online", label: "Online" },
+  ];
 
   return (
     <AdminLayout>
