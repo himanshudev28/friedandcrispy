@@ -288,7 +288,9 @@ const AdminDashboard = () => {
         {/* Recent Sales with Pagination */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-display">Sales ({filtered.length})</CardTitle>
+            <CardTitle className="text-lg font-display">
+              Sales ({filtered.length}){paymentFilter !== "all" && ` — ${paymentFilter}`}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {filtered.length === 0 ? (
