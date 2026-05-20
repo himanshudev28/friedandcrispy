@@ -16,6 +16,7 @@ import * as XLSX from "xlsx";
 import { toast } from "sonner";
 
 type DatePreset = "today" | "week" | "month" | "year" | "custom";
+type PaymentFilter = "all" | "Cash" | "Online";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -25,6 +26,7 @@ const AdminDashboard = () => {
   const [customFrom, setCustomFrom] = useState<Date | undefined>();
   const [customTo, setCustomTo] = useState<Date | undefined>();
   const [page, setPage] = useState(1);
+  const [paymentFilter, setPaymentFilter] = useState<PaymentFilter>("all");
 
   const { data: sales = [] } = useQuery({
     queryKey: ["sales"],
@@ -63,9 +65,11 @@ const AdminDashboard = () => {
   const filtered = useMemo(() =>
     sales.filter((s) => {
       const d = new Date(s.created_at);
-      return isWithinInterval(d, { start: dateRange.start, end: dateRange.end });
+      const inDateRange = isWithinInterval(d, { start: dateRange.start, end: dateRange.end });
+      const matchesPayment = paymentFilter === "all" || s.payment_method === paymentFilter;
+      return inDateRange && matchesPayment;
     }),
-  [sales, dateRange]);
+  [sales, dateRange, paymentFilter]);
 
   const totalRevenue = filtered.reduce((sum, s) => sum + s.total, 0);
   const totalOrders = filtered.length;
@@ -118,6 +122,13 @@ const AdminDashboard = () => {
 
   // Reset page when filters change
   const handlePreset = (p: DatePreset) => { setPreset(p); setPage(1); };
+  const handlePaymentFilter = (p: PaymentFilter) => { setPaymentFilter(p); setPage(1); };
+
+  const paymentButtons: { key: PaymentFilter; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "Cash", label: "Cash" },
+    { key: "Online", label: "Online" },
+  ];
 
   return (
     <AdminLayout>
@@ -177,7 +188,21 @@ const AdminDashboard = () => {
           )}
         </div>
 
-        {/* Metrics */}
+        {/* Payment Method Filter */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-muted-foreground font-body mr-1">Payment:</span>
+          {paymentButtons.map((b) => (
+            <Button
+              key={b.key}
+              variant={paymentFilter === b.key ? "default" : "outline"}
+              size="sm"
+              className="font-body rounded-full"
+              onClick={() => handlePaymentFilter(b.key)}
+            >
+              {b.label}
+            </Button>
+          ))}
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Card>
             <CardContent className="pt-6">
@@ -263,7 +288,9 @@ const AdminDashboard = () => {
         {/* Recent Sales with Pagination */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle className="text-lg font-display">Sales ({filtered.length})</CardTitle>
+            <CardTitle className="text-lg font-display">
+              Sales ({filtered.length}){paymentFilter !== "all" && ` — ${paymentFilter}`}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {filtered.length === 0 ? (
