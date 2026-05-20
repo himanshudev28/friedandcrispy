@@ -65,9 +65,11 @@ const AdminDashboard = () => {
   const filtered = useMemo(() =>
     sales.filter((s) => {
       const d = new Date(s.created_at);
-      return isWithinInterval(d, { start: dateRange.start, end: dateRange.end });
+      const inDateRange = isWithinInterval(d, { start: dateRange.start, end: dateRange.end });
+      const matchesPayment = paymentFilter === "all" || s.payment_method === paymentFilter;
+      return inDateRange && matchesPayment;
     }),
-  [sales, dateRange]);
+  [sales, dateRange, paymentFilter]);
 
   const totalRevenue = filtered.reduce((sum, s) => sum + s.total, 0);
   const totalOrders = filtered.length;
