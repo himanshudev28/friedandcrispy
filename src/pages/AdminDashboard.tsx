@@ -188,7 +188,21 @@ const AdminDashboard = () => {
           )}
         </div>
 
-        {/* Metrics */}
+        {/* Payment Method Filter */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm text-muted-foreground font-body mr-1">Payment:</span>
+          {paymentButtons.map((b) => (
+            <Button
+              key={b.key}
+              variant={paymentFilter === b.key ? "default" : "outline"}
+              size="sm"
+              className="font-body rounded-full"
+              onClick={() => handlePaymentFilter(b.key)}
+            >
+              {b.label}
+            </Button>
+          ))}
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Card>
             <CardContent className="pt-6">
