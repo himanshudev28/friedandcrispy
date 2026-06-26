@@ -116,7 +116,7 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="relative h-[100svh] min-h-[600px] flex items-center overflow-hidden">
-        <motion.div className="absolute inset-0" style={{ opacity: heroOpacity, scale: heroScale }}>
+        <motion.div className="absolute inset-0 will-change-transform" style={{ y: heroY, scale: heroScale }}>
           <img
             src={heroBg}
             alt="Delicious fried chicken and burgers"
@@ -125,10 +125,24 @@ const Index = () => {
             height={1080}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
         </motion.div>
 
-        <div className="container mx-auto px-4 relative z-10">
+        {/* Floating colorful blobs */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <motion.div
+            className="absolute -top-20 -left-20 w-72 h-72 rounded-full bg-primary/30 blur-3xl"
+            animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
+            transition={{ repeat: Infinity, duration: 12, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute bottom-10 right-10 w-80 h-80 rounded-full bg-accent/30 blur-3xl"
+            animate={{ x: [0, -30, 0], y: [0, -40, 0] }}
+            transition={{ repeat: Infinity, duration: 14, ease: "easeInOut" }}
+          />
+        </div>
+
+        <motion.div style={{ y: contentY }} className="container mx-auto px-4 relative z-10">
           <div className="max-w-2xl">
             <motion.div
               initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}
