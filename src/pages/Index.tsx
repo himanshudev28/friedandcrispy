@@ -185,7 +185,7 @@ const Index = () => {
               </a>
             </motion.div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Scroll indicator */}
         <motion.div
