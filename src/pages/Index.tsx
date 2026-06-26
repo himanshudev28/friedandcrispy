@@ -207,14 +207,16 @@ const Index = () => {
             className="bg-card/80 backdrop-blur-xl border rounded-2xl shadow-2xl p-6 md:p-8 grid grid-cols-3 gap-4 md:gap-8"
           >
             {[
-              { icon: Star, label: "Happy Customers", value: "2K+" },
-              { icon: UtensilsCrossed, label: "Menu Items", value: "80+" },
-              { icon: Clock, label: "Fast Delivery", value: "30min" },
+              { icon: Star, label: "Happy Customers", value: "2K+", grad: "from-amber-400 to-orange-500" },
+              { icon: UtensilsCrossed, label: "Menu Items", value: "80+", grad: "from-rose-400 to-red-500" },
+              { icon: Clock, label: "Fast Delivery", value: "30min", grad: "from-emerald-400 to-teal-500" },
             ].map((stat, i) => (
               <motion.div key={stat.label} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={scaleIn}
-                className="text-center space-y-1"
+                className="text-center space-y-2"
               >
-                <stat.icon className="h-6 w-6 md:h-8 md:w-8 text-primary mx-auto" />
+                <div className={`mx-auto h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-gradient-to-br ${stat.grad} flex items-center justify-center shadow-lg shadow-black/10`}>
+                  <stat.icon className="h-6 w-6 md:h-7 md:w-7 text-white" />
+                </div>
                 <p className="text-xl md:text-3xl font-bold font-display text-foreground">{stat.value}</p>
                 <p className="text-xs md:text-sm text-muted-foreground font-body">{stat.label}</p>
               </motion.div>
