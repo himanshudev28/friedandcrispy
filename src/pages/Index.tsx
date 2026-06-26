@@ -21,9 +21,11 @@ const scaleIn = {
 
 const Index = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.15], [1, 1.1]);
+  const { scrollY } = useScroll();
+  // Subtle parallax only — hero stays visible, no fade-out
+  const heroY = useTransform(scrollY, [0, 600], [0, 120]);
+  const heroScale = useTransform(scrollY, [0, 600], [1, 1.08]);
+  const contentY = useTransform(scrollY, [0, 600], [0, -40]);
 
   const { data: featuredItems } = useQuery({
     queryKey: ["featured-menu"],
@@ -114,7 +116,7 @@ const Index = () => {
 
       {/* Hero Section */}
       <section className="relative h-[100svh] min-h-[600px] flex items-center overflow-hidden">
-        <motion.div className="absolute inset-0" style={{ opacity: heroOpacity, scale: heroScale }}>
+        <motion.div className="absolute inset-0 will-change-transform" style={{ y: heroY, scale: heroScale }}>
           <img
             src={heroBg}
             alt="Delicious fried chicken and burgers"
@@ -123,10 +125,24 @@ const Index = () => {
             height={1080}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
         </motion.div>
 
-        <div className="container mx-auto px-4 relative z-10">
+        {/* Floating colorful blobs */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <motion.div
+            className="absolute -top-20 -left-20 w-72 h-72 rounded-full bg-primary/30 blur-3xl"
+            animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
+            transition={{ repeat: Infinity, duration: 12, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute bottom-10 right-10 w-80 h-80 rounded-full bg-accent/30 blur-3xl"
+            animate={{ x: [0, -30, 0], y: [0, -40, 0] }}
+            transition={{ repeat: Infinity, duration: 14, ease: "easeInOut" }}
+          />
+        </div>
+
+        <motion.div style={{ y: contentY }} className="container mx-auto px-4 relative z-10">
           <div className="max-w-2xl">
             <motion.div
               initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}
@@ -169,7 +185,7 @@ const Index = () => {
               </a>
             </motion.div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Scroll indicator */}
         <motion.div
@@ -191,14 +207,16 @@ const Index = () => {
             className="bg-card/80 backdrop-blur-xl border rounded-2xl shadow-2xl p-6 md:p-8 grid grid-cols-3 gap-4 md:gap-8"
           >
             {[
-              { icon: Star, label: "Happy Customers", value: "2K+" },
-              { icon: UtensilsCrossed, label: "Menu Items", value: "80+" },
-              { icon: Clock, label: "Fast Delivery", value: "30min" },
+              { icon: Star, label: "Happy Customers", value: "2K+", grad: "from-amber-400 to-orange-500" },
+              { icon: UtensilsCrossed, label: "Menu Items", value: "80+", grad: "from-rose-400 to-red-500" },
+              { icon: Clock, label: "Fast Delivery", value: "30min", grad: "from-emerald-400 to-teal-500" },
             ].map((stat, i) => (
               <motion.div key={stat.label} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={scaleIn}
-                className="text-center space-y-1"
+                className="text-center space-y-2"
               >
-                <stat.icon className="h-6 w-6 md:h-8 md:w-8 text-primary mx-auto" />
+                <div className={`mx-auto h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-gradient-to-br ${stat.grad} flex items-center justify-center shadow-lg shadow-black/10`}>
+                  <stat.icon className="h-6 w-6 md:h-7 md:w-7 text-white" />
+                </div>
                 <p className="text-xl md:text-3xl font-bold font-display text-foreground">{stat.value}</p>
                 <p className="text-xs md:text-sm text-muted-foreground font-body">{stat.label}</p>
               </motion.div>
@@ -217,18 +235,32 @@ const Index = () => {
               <p className="text-muted-foreground font-body max-w-md mx-auto">Something delicious for every craving</p>
             </motion.div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {categories.slice(0, 8).map((cat, i) => (
-                <motion.div key={cat} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                  <Link to={`/menu?category=${cat}`}
-                    className="block p-6 md:p-8 rounded-2xl bg-card border border-border/50 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 text-center group hover:-translate-y-1"
-                  >
-                    <span className="text-4xl md:text-5xl block mb-3 group-hover:scale-110 transition-transform duration-300">
-                      {categoryIcons[cat] || "🍽️"}
-                    </span>
-                    <h3 className="font-display font-semibold text-base md:text-lg text-foreground group-hover:text-primary transition-colors">{cat}</h3>
-                  </Link>
-                </motion.div>
-              ))}
+              {categories.slice(0, 8).map((cat, i) => {
+                const grads = [
+                  "from-rose-400 to-orange-400",
+                  "from-amber-400 to-yellow-500",
+                  "from-emerald-400 to-teal-500",
+                  "from-sky-400 to-indigo-500",
+                  "from-fuchsia-400 to-pink-500",
+                  "from-lime-400 to-green-500",
+                  "from-violet-400 to-purple-500",
+                  "from-cyan-400 to-blue-500",
+                ];
+                const grad = grads[i % grads.length];
+                return (
+                  <motion.div key={cat} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                    <Link to={`/menu?category=${cat}`}
+                      className="relative block p-6 md:p-8 rounded-2xl bg-card border border-border/50 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 text-center group hover:-translate-y-1 overflow-hidden"
+                    >
+                      <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 bg-gradient-to-br ${grad} transition-opacity duration-300`} />
+                      <div className={`relative mx-auto mb-3 h-14 w-14 md:h-16 md:w-16 rounded-2xl bg-gradient-to-br ${grad} flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
+                        <span className="text-3xl md:text-4xl">{categoryIcons[cat] || "🍽️"}</span>
+                      </div>
+                      <h3 className="relative font-display font-semibold text-base md:text-lg text-foreground group-hover:text-primary transition-colors">{cat}</h3>
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </section>
