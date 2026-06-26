@@ -114,7 +114,28 @@ const Index = () => {
         )}
       </nav>
 
+      {/* Promo Marquee Strip */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary via-accent to-primary text-primary-foreground border-b border-primary/20">
+        <div className="flex whitespace-nowrap animate-marquee py-2 text-xs sm:text-sm font-body font-semibold">
+          {Array.from({ length: 2 }).map((_, dup) => (
+            <div key={dup} className="flex shrink-0 items-center gap-10 px-10">
+              <span className="flex items-center gap-2"><Flame className="h-4 w-4" /> Fresh & Hot in 30 mins</span>
+              <span>•</span>
+              <span>🚚 Free delivery on orders above ₹299</span>
+              <span>•</span>
+              <span>⭐ 4.8/5 from 1000+ happy customers</span>
+              <span>•</span>
+              <span>🎉 Flat 10% OFF on your first online order — Code: <b>CRISPY10</b></span>
+              <span>•</span>
+              <span>📞 Order on WhatsApp — instant confirmation</span>
+              <span>•</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Hero Section */}
+
       <section className="relative h-[100svh] min-h-[600px] flex items-center overflow-hidden">
         <motion.div className="absolute inset-0 will-change-transform" style={{ y: heroY, scale: heroScale }}>
           <img
