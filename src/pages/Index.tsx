@@ -21,9 +21,11 @@ const scaleIn = {
 
 const Index = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.15], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.15], [1, 1.1]);
+  const { scrollY } = useScroll();
+  // Subtle parallax only — hero stays visible, no fade-out
+  const heroY = useTransform(scrollY, [0, 600], [0, 120]);
+  const heroScale = useTransform(scrollY, [0, 600], [1, 1.08]);
+  const contentY = useTransform(scrollY, [0, 600], [0, -40]);
 
   const { data: featuredItems } = useQuery({
     queryKey: ["featured-menu"],
