@@ -235,18 +235,32 @@ const Index = () => {
               <p className="text-muted-foreground font-body max-w-md mx-auto">Something delicious for every craving</p>
             </motion.div>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {categories.slice(0, 8).map((cat, i) => (
-                <motion.div key={cat} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                  <Link to={`/menu?category=${cat}`}
-                    className="block p-6 md:p-8 rounded-2xl bg-card border border-border/50 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 text-center group hover:-translate-y-1"
-                  >
-                    <span className="text-4xl md:text-5xl block mb-3 group-hover:scale-110 transition-transform duration-300">
-                      {categoryIcons[cat] || "🍽️"}
-                    </span>
-                    <h3 className="font-display font-semibold text-base md:text-lg text-foreground group-hover:text-primary transition-colors">{cat}</h3>
-                  </Link>
-                </motion.div>
-              ))}
+              {categories.slice(0, 8).map((cat, i) => {
+                const grads = [
+                  "from-rose-400 to-orange-400",
+                  "from-amber-400 to-yellow-500",
+                  "from-emerald-400 to-teal-500",
+                  "from-sky-400 to-indigo-500",
+                  "from-fuchsia-400 to-pink-500",
+                  "from-lime-400 to-green-500",
+                  "from-violet-400 to-purple-500",
+                  "from-cyan-400 to-blue-500",
+                ];
+                const grad = grads[i % grads.length];
+                return (
+                  <motion.div key={cat} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
+                    <Link to={`/menu?category=${cat}`}
+                      className="relative block p-6 md:p-8 rounded-2xl bg-card border border-border/50 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 text-center group hover:-translate-y-1 overflow-hidden"
+                    >
+                      <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 bg-gradient-to-br ${grad} transition-opacity duration-300`} />
+                      <div className={`relative mx-auto mb-3 h-14 w-14 md:h-16 md:w-16 rounded-2xl bg-gradient-to-br ${grad} flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
+                        <span className="text-3xl md:text-4xl">{categoryIcons[cat] || "🍽️"}</span>
+                      </div>
+                      <h3 className="relative font-display font-semibold text-base md:text-lg text-foreground group-hover:text-primary transition-colors">{cat}</h3>
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </section>
