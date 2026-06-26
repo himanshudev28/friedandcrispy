@@ -278,8 +278,11 @@ const Index = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {featuredItems.map((item, i) => (
                 <motion.div key={item.id} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
-                  className="rounded-2xl bg-card border border-border/50 overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 group hover:-translate-y-1"
+                  className="card-glow relative rounded-2xl bg-card border border-border/50 overflow-hidden group"
                 >
+                  <span className="absolute top-3 left-3 z-10 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground shadow-lg">
+                    <Flame className="h-3 w-3" /> Hot
+                  </span>
                   {item.image_url ? (
                     <div className="aspect-[4/3] overflow-hidden">
                       <img src={item.image_url} alt={item.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -295,7 +298,7 @@ const Index = () => {
                     <div className="flex items-center justify-between mt-3">
                       <p className="text-2xl font-bold text-primary font-body">₹{item.price.toFixed(0)}</p>
                       <Link to="/menu">
-                        <Button size="sm" className="rounded-full font-body shadow-md">
+                        <Button size="sm" className="rounded-full font-body shadow-md group-hover:shadow-primary/40 group-hover:shadow-lg transition-shadow">
                           Order <ArrowRight className="h-3 w-3 ml-1" />
                         </Button>
                       </Link>
@@ -303,6 +306,7 @@ const Index = () => {
                   </div>
                 </motion.div>
               ))}
+
             </div>
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={3} className="text-center mt-12">
               <Link to="/menu">
