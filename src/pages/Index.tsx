@@ -1,7 +1,21 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { UtensilsCrossed, Star, Clock, MapPin, Phone, Mail, ArrowRight, Flame, Menu, X } from "lucide-react";
+import {
+  UtensilsCrossed,
+  Star,
+  Clock,
+  MapPin,
+  Phone,
+  Mail,
+  ArrowRight,
+  Flame,
+  Menu,
+  X,
+  Leaf,
+  Drumstick,
+  Sparkles,
+} from "lucide-react";
 import { useState } from "react";
 import ThemeToggle from "@/components/ThemeToggle";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,21 +25,15 @@ import heroBg from "@/assets/hero-bg.jpg";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
-  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.12, duration: 0.6 } }),
-};
-
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: (i: number) => ({ opacity: 1, scale: 1, transition: { delay: i * 0.1, duration: 0.5 } }),
+  visible: (i: number) => ({ opacity: 1, y: 0, transition: { delay: i * 0.1, duration: 0.6 } }),
 };
 
 const Index = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { scrollY } = useScroll();
-  // Subtle parallax only — hero stays visible, no fade-out
-  const heroY = useTransform(scrollY, [0, 600], [0, 120]);
-  const heroScale = useTransform(scrollY, [0, 600], [1, 1.08]);
-  const contentY = useTransform(scrollY, [0, 600], [0, -40]);
+  const heroImgY = useTransform(scrollY, [0, 800], [0, 200]);
+  const heroImgScale = useTransform(scrollY, [0, 800], [1, 1.15]);
+  const heroWordsY = useTransform(scrollY, [0, 800], [0, -80]);
 
   const { data: featuredItems } = useQuery({
     queryKey: ["featured-menu"],
@@ -44,366 +52,424 @@ const Index = () => {
   });
 
   const categoryIcons: Record<string, string> = {
-    "Burgers": "🍔", "Pizza": "🍕", "Drinks": "🥤", "Desserts": "🍰",
-    "Momos": "🥟", "Chinese": "🍜", "Rolls": "🌯", "Shakes": "🥤",
-    "Noodles": "🍝", "Rice": "🍚", "Combo": "🍱", "Snacks": "🍟",
-    "Sandwich": "🥪", "Wraps": "🌮", "Pasta": "🍝",
+    Burgers: "🍔", Pizza: "🍕", Drinks: "🥤", Desserts: "🍰",
+    Momos: "🥟", Chinese: "🍜", Rolls: "🌯", Shakes: "🥤",
+    Noodles: "🍝", Rice: "🍚", Combo: "🍱", Snacks: "🍟",
+    Sandwich: "🥪", Wraps: "🌮", Pasta: "🍝",
   };
 
+  const heroWords = ["SMASHED", "FRESH", "BOLD FLAVOR", "HOT", "JUICY"];
+
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
-      {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/60 backdrop-blur-xl border-b border-border/50">
-        <div className="container mx-auto flex items-center justify-between h-16 px-4">
+    <div className="min-h-screen bg-background overflow-x-hidden text-foreground">
+      {/* ───────────── NAV ───────────── */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-primary text-primary-foreground border-b border-primary-foreground/10">
+        <div className="container mx-auto flex items-center justify-between h-14 px-4">
           <Link to="/" className="flex items-center gap-2 group">
-            <Flame className="h-7 w-7 text-primary group-hover:scale-110 transition-transform" />
-            <span className="text-xl font-display font-bold text-foreground">Fried&Crispy</span>
+            <Flame className="h-6 w-6 group-hover:rotate-12 transition-transform" />
+            <span className="font-stamp text-base sm:text-lg tracking-wider">FRIED&amp;CRISPY</span>
           </Link>
 
-          {/* Desktop nav */}
-          <div className="hidden sm:flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-1 font-stamp text-xs tracking-widest">
+            <Link to="/menu" className="px-3 py-2 hover:opacity-70 transition-opacity">MENU</Link>
+            <Link to="/track" className="px-3 py-2 hover:opacity-70 transition-opacity">TRACK</Link>
+            <Link to="/admin" className="px-3 py-2 hover:opacity-70 transition-opacity">ADMIN</Link>
             <ThemeToggle />
-            <Link to="/track">
-              <Button variant="ghost" className="font-body text-foreground hover:text-foreground">Track Order</Button>
-            </Link>
             <Link to="/menu">
-              <Button variant="ghost" className="font-body text-foreground hover:text-foreground">Menu</Button>
-            </Link>
-            <Link to="/admin">
-              <Button variant="ghost" className="font-body text-foreground hover:text-foreground">Admin</Button>
-            </Link>
-            <Link to="/menu">
-              <Button className="font-body rounded-full px-5 shadow-md">
-                Order Now <ArrowRight className="h-4 w-4 ml-1" />
+              <Button variant="secondary" className="ml-2 rounded-none font-stamp text-xs tracking-widest h-9 px-5 bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+                ORDER NOW
               </Button>
             </Link>
           </div>
 
-          {/* Mobile hamburger */}
-          <div className="flex sm:hidden items-center gap-2">
+          <div className="flex md:hidden items-center gap-1">
             <ThemeToggle />
-            <Button variant="ghost" size="icon" className="text-foreground" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button
+              aria-label="Toggle menu"
+              className="p-2"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </Button>
+            </button>
           </div>
         </div>
 
-        {/* Mobile dropdown */}
         {mobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }}
+            initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="sm:hidden bg-background/95 backdrop-blur-xl border-b border-border/50 px-4 py-3 space-y-1"
+            className="md:hidden bg-primary border-t border-primary-foreground/10 px-4 py-3 space-y-1 font-stamp text-sm tracking-widest"
           >
-            <Link to="/track" onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="ghost" size="sm" className="w-full justify-start font-body text-foreground text-sm h-9">Track Order</Button>
-            </Link>
+            {[
+              { to: "/menu", label: "MENU" },
+              { to: "/track", label: "TRACK ORDER" },
+              { to: "/admin", label: "ADMIN" },
+            ].map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                onClick={() => setMobileMenuOpen(false)}
+                className="block py-2 hover:opacity-70"
+              >
+                {l.label}
+              </Link>
+            ))}
             <Link to="/menu" onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="ghost" size="sm" className="w-full justify-start font-body text-foreground text-sm h-9">Menu</Button>
-            </Link>
-            <Link to="/admin" onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="ghost" size="sm" className="w-full justify-start font-body text-foreground text-sm h-9">Admin</Button>
-            </Link>
-            <Link to="/menu" onClick={() => setMobileMenuOpen(false)}>
-              <Button size="sm" className="w-full font-body rounded-full shadow-md mt-1 h-9">
-                Order Now <ArrowRight className="h-4 w-4 ml-1" />
+              <Button className="w-full rounded-none font-stamp text-xs tracking-widest bg-primary-foreground text-primary hover:bg-primary-foreground/90 mt-2">
+                ORDER NOW
               </Button>
             </Link>
           </motion.div>
         )}
       </nav>
 
-      {/* Promo Marquee Strip */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-primary via-accent to-primary text-primary-foreground border-b border-primary/20">
-        <div className="flex whitespace-nowrap animate-marquee py-2 text-xs sm:text-sm font-body font-semibold">
-          {Array.from({ length: 2 }).map((_, dup) => (
-            <div key={dup} className="flex shrink-0 items-center gap-10 px-10">
-              <span className="flex items-center gap-2"><Flame className="h-4 w-4" /> Fresh & Hot in 30 mins</span>
-              <span>•</span>
-              <span>🚚 Free delivery on orders above ₹299</span>
-              <span>•</span>
-              <span>⭐ 4.8/5 from 1000+ happy customers</span>
-              <span>•</span>
-              <span>🎉 Flat 10% OFF on your first online order — Code: <b>CRISPY10</b></span>
-              <span>•</span>
-              <span>📞 Order on WhatsApp — instant confirmation</span>
-              <span>•</span>
+      {/* ───────────── HERO ───────────── */}
+      <section className="relative bg-primary text-primary-foreground pt-14 overflow-hidden">
+        {/* Background ticker words */}
+        <motion.div
+          style={{ y: heroWordsY }}
+          className="pointer-events-none absolute inset-0 flex flex-col justify-center gap-2 opacity-15 select-none"
+        >
+          {[0, 1, 2].map((row) => (
+            <div key={row} className="flex whitespace-nowrap animate-ticker font-mega text-[18vw] sm:text-[14vw]">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <span key={i} className="px-8">
+                  {heroWords[(row + i) % heroWords.length]} •
+                </span>
+              ))}
             </div>
           ))}
-        </div>
-      </div>
-
-      {/* Hero Section */}
-
-      <section className="relative h-[100svh] min-h-[600px] flex items-center overflow-hidden">
-        <motion.div className="absolute inset-0 will-change-transform" style={{ y: heroY, scale: heroScale }}>
-          <img
-            src={heroBg}
-            alt="Delicious fried chicken and burgers"
-            className="w-full h-full object-cover"
-            width={1920}
-            height={1080}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent" />
         </motion.div>
 
-        {/* Floating colorful blobs */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <motion.div
-            className="absolute -top-20 -left-20 w-72 h-72 rounded-full bg-primary/30 blur-3xl"
-            animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
-            transition={{ repeat: Infinity, duration: 12, ease: "easeInOut" }}
-          />
-          <motion.div
-            className="absolute bottom-10 right-10 w-80 h-80 rounded-full bg-accent/30 blur-3xl"
-            animate={{ x: [0, -30, 0], y: [0, -40, 0] }}
-            transition={{ repeat: Infinity, duration: 14, ease: "easeInOut" }}
-          />
-        </div>
+        <div className="relative container mx-auto px-4 pt-10 pb-0 min-h-[92svh] flex flex-col">
+          {/* Top labels */}
+          <div className="flex justify-between items-start font-stamp text-[10px] sm:text-xs tracking-widest opacity-80">
+            <div>
+              <p>EST. GORAKHPUR</p>
+              <p className="mt-1">SINCE — '24</p>
+            </div>
+            <div className="text-right">
+              <p>FRIED &amp; CRISPY</p>
+              <p className="mt-1">N° 001 / SERIES</p>
+            </div>
+          </div>
 
-        <motion.div style={{ y: contentY }} className="container mx-auto px-4 relative z-10">
-          <div className="max-w-2xl">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 bg-primary/20 backdrop-blur-sm border border-primary/30 rounded-full px-4 py-1.5 mb-6"
-            >
-              <Flame className="h-4 w-4 text-primary" />
-              <span className="text-sm font-body text-primary-foreground/90">Freshly Made with Love</span>
-            </motion.div>
-
+          {/* Big stacked headline */}
+          <div className="relative flex-1 flex flex-col justify-center py-10">
             <motion.h1
-              initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15, duration: 0.7 }}
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-display font-bold text-white leading-[1.05] mb-6"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="font-mega text-[22vw] sm:text-[18vw] md:text-[15vw] leading-[0.82] text-center"
             >
-              Taste the{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
-                Crunch
-              </span>
+              <span className="block">THE</span>
+              <span className="block text-outline">CHICKEN</span>
             </motion.h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 0.7 }}
-              className="text-lg md:text-xl text-white/70 mb-10 font-body max-w-lg leading-relaxed"
-            >
-              Crispy fried chicken, loaded burgers & bold flavors — crafted fresh daily at Fried&Crispy, Gorakhpur.
-            </motion.p>
+            {/* Hero image floating in the middle */}
+            <motion.img
+              style={{ y: heroImgY, scale: heroImgScale }}
+              src={heroBg}
+              alt="Hot crispy fried chicken"
+              className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[58%] sm:w-[44%] md:w-[36%] max-w-[520px] aspect-square object-cover rounded-full shadow-[0_30px_80px_-20px_rgba(0,0,0,0.55)] ring-8 ring-primary-foreground/10"
+            />
+          </div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.7 }}
-              className="flex flex-wrap gap-4"
-            >
+          {/* Bottom CTA row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pb-10 items-end">
+            <p className="font-body text-sm md:text-base leading-relaxed opacity-90 max-w-xs">
+              Smashed hot, fried golden — our crispy birds lock in juiciness under a shattering crust. Built bold since day one.
+            </p>
+            <div className="flex md:justify-center">
               <Link to="/menu">
-                <Button size="lg" className="text-lg px-8 py-6 rounded-full font-body shadow-2xl shadow-primary/30 hover:shadow-primary/50 transition-all hover:scale-105">
-                  <UtensilsCrossed className="h-5 w-5 mr-2" /> View Menu
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="rounded-full px-8 h-14 font-stamp tracking-widest text-sm bg-primary-foreground text-primary hover:bg-primary-foreground/90 shadow-2xl"
+                >
+                  ORDER NOW <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
-              <a href="tel:+917007835915">
-                <Button size="lg" variant="outline" className="text-lg px-8 py-6 rounded-full font-body border-primary/50 text-primary-foreground bg-primary/20 hover:bg-primary/30 backdrop-blur-sm">
-                  <Phone className="h-5 w-5 mr-2" /> Call Us
-                </Button>
-              </a>
-            </motion.div>
+            </div>
+            <div className="md:text-right font-stamp text-[10px] sm:text-xs tracking-widest opacity-80 space-y-1">
+              <p>FRESH • HOT • 30 MIN</p>
+              <p>FREE DELIVERY ABOVE ₹299</p>
+              <p>WHATSAPP — INSTANT CONFIRM</p>
+            </div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-        >
-          <div className="w-6 h-10 rounded-full border-2 border-white/30 flex items-start justify-center p-1.5">
-            <motion.div className="w-1.5 h-1.5 rounded-full bg-white/60" animate={{ y: [0, 12, 0] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }} />
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Stats Bar */}
-      <section className="relative -mt-16 z-20 px-4">
-        <div className="container mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
-            className="bg-card/80 backdrop-blur-xl border rounded-2xl shadow-2xl p-6 md:p-8 grid grid-cols-3 gap-4 md:gap-8"
-          >
-            {[
-              { icon: Star, label: "Happy Customers", value: "2K+", grad: "from-amber-400 to-orange-500" },
-              { icon: UtensilsCrossed, label: "Menu Items", value: "80+", grad: "from-rose-400 to-red-500" },
-              { icon: Clock, label: "Fast Delivery", value: "30min", grad: "from-emerald-400 to-teal-500" },
-            ].map((stat, i) => (
-              <motion.div key={stat.label} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={scaleIn}
-                className="text-center space-y-2"
-              >
-                <div className={`mx-auto h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-gradient-to-br ${stat.grad} flex items-center justify-center shadow-lg shadow-black/10`}>
-                  <stat.icon className="h-6 w-6 md:h-7 md:w-7 text-white" />
-                </div>
-                <p className="text-xl md:text-3xl font-bold font-display text-foreground">{stat.value}</p>
-                <p className="text-xs md:text-sm text-muted-foreground font-body">{stat.label}</p>
-              </motion.div>
+        {/* Ticker strip at bottom of hero */}
+        <div className="bg-foreground text-background border-y border-foreground/20 overflow-hidden">
+          <div className="flex whitespace-nowrap animate-marquee py-3 font-stamp text-xs sm:text-sm tracking-widest">
+            {Array.from({ length: 2 }).map((_, d) => (
+              <div key={d} className="flex shrink-0 items-center gap-8 px-8">
+                <span>★ FRESH BATCH HOURLY</span><span>—</span>
+                <span>★ HAND-BREADED</span><span>—</span>
+                <span>★ 1000+ HAPPY EATERS</span><span>—</span>
+                <span>★ CODE: CRISPY10 — 10% OFF</span><span>—</span>
+                <span>★ DELIVERED IN 30 MIN</span><span>—</span>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* Categories */}
+      {/* ───────────── ABOUT / JUICY CHEESY ───────────── */}
+      <section className="bg-background py-20 md:py-32 relative overflow-hidden">
+        <div className="container mx-auto px-4 grid md:grid-cols-12 gap-10 items-center">
+          <div className="md:col-span-7 space-y-6">
+            <p className="font-stamp text-xs tracking-[0.3em] text-primary">— TOP CLASSIC</p>
+            <h2 className="font-mega text-[14vw] md:text-[7vw] leading-[0.85] text-foreground">
+              juicy <span className="text-primary">crispy</span><br />
+              fully <span className="text-outline-dark">loaded</span>
+            </h2>
+            <p className="font-body text-base md:text-lg text-muted-foreground max-w-lg leading-relaxed">
+              Fried&amp;Crispy is back and bolder than ever. Honouring our rich roots, we bring you the
+              ultimate crispy experience — fully loaded, hot, and crafted fresh, every single time.
+            </p>
+            <Link to="/menu">
+              <Button size="lg" className="rounded-full font-stamp tracking-widest text-xs h-12 px-7">
+                EXPLORE MENU <ArrowRight className="h-4 w-4 ml-2" />
+              </Button>
+            </Link>
+          </div>
+
+          <div className="md:col-span-5 grid grid-cols-2 gap-4">
+            {[
+              { icon: Drumstick, label: "Hand Breaded", bg: "bg-primary text-primary-foreground" },
+              { icon: Leaf, label: "Fresh Daily", bg: "bg-foreground text-background" },
+              { icon: Flame, label: "Fire Fried", bg: "bg-accent text-accent-foreground" },
+              { icon: Sparkles, label: "Crispy Crust", bg: "bg-background text-foreground border-2 border-foreground" },
+            ].map((b, i) => (
+              <motion.div
+                key={b.label}
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                className={`${b.bg} aspect-square rounded-3xl p-5 flex flex-col justify-between`}
+              >
+                <b.icon className="h-7 w-7" />
+                <p className="font-stamp text-base sm:text-lg tracking-wider leading-tight">{b.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ───────────── FOOD THAT FEELS GOOD ───────────── */}
+      <section className="bg-foreground text-background py-20 md:py-28 relative overflow-hidden">
+        <div className="container mx-auto px-4 text-center">
+          <p className="font-stamp text-xs tracking-[0.3em] text-primary mb-4">— EXPERIENCE</p>
+          <h2 className="font-mega text-[12vw] md:text-[7vw] leading-[0.85] mb-12">
+            food that <span className="text-primary">feels</span> good
+          </h2>
+
+          <div className="grid grid-cols-3 gap-4 md:gap-10 max-w-4xl mx-auto">
+            {[
+              { value: "30", unit: "MIN", label: "Hot Delivery" },
+              { value: "100%", unit: "FRESH", label: "Daily Prep" },
+              { value: "2K+", unit: "FANS", label: "In Gorakhpur" },
+            ].map((s, i) => (
+              <motion.div
+                key={s.label}
+                custom={i}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                className="border-t-2 border-background/30 pt-4 text-left"
+              >
+                <p className="font-mega text-5xl md:text-7xl leading-none">{s.value}</p>
+                <p className="font-stamp text-[10px] tracking-[0.2em] opacity-70 mt-2">{s.unit}</p>
+                <p className="font-body text-sm mt-1 opacity-80">{s.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ───────────── CATEGORIES ───────────── */}
       {categories.length > 0 && (
-        <section className="py-20 md:py-28">
+        <section className="bg-background py-20 md:py-28">
           <div className="container mx-auto px-4">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} className="text-center mb-14">
-              <span className="text-primary font-body font-semibold uppercase tracking-widest text-sm">Explore</span>
-              <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground mt-2 mb-3">Our Categories</h2>
-              <p className="text-muted-foreground font-body max-w-md mx-auto">Something delicious for every craving</p>
-            </motion.div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-              {categories.slice(0, 8).map((cat, i) => {
-                const grads = [
-                  "from-rose-400 to-orange-400",
-                  "from-amber-400 to-yellow-500",
-                  "from-emerald-400 to-teal-500",
-                  "from-sky-400 to-indigo-500",
-                  "from-fuchsia-400 to-pink-500",
-                  "from-lime-400 to-green-500",
-                  "from-violet-400 to-purple-500",
-                  "from-cyan-400 to-blue-500",
-                ];
-                const grad = grads[i % grads.length];
-                return (
-                  <motion.div key={cat} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                    <Link to={`/menu?category=${cat}`}
-                      className="relative block p-6 md:p-8 rounded-2xl bg-card border border-border/50 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 text-center group hover:-translate-y-1 overflow-hidden"
-                    >
-                      <div className={`absolute inset-0 opacity-0 group-hover:opacity-10 bg-gradient-to-br ${grad} transition-opacity duration-300`} />
-                      <div className={`relative mx-auto mb-3 h-14 w-14 md:h-16 md:w-16 rounded-2xl bg-gradient-to-br ${grad} flex items-center justify-center shadow-md group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
-                        <span className="text-3xl md:text-4xl">{categoryIcons[cat] || "🍽️"}</span>
-                      </div>
-                      <h3 className="relative font-display font-semibold text-base md:text-lg text-foreground group-hover:text-primary transition-colors">{cat}</h3>
-                    </Link>
-                  </motion.div>
-                );
-              })}
+            <div className="flex items-end justify-between mb-12 flex-wrap gap-4">
+              <div>
+                <p className="font-stamp text-xs tracking-[0.3em] text-primary mb-3">— EXPLORE</p>
+                <h2 className="font-mega text-5xl md:text-7xl text-foreground">categories</h2>
+              </div>
+              <Link to="/menu" className="font-stamp text-xs tracking-widest text-foreground hover:text-primary inline-flex items-center gap-2">
+                ALL CATEGORIES <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+              {categories.slice(0, 8).map((cat, i) => (
+                <motion.div
+                  key={cat}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeUp}
+                >
+                  <Link
+                    to={`/menu?category=${cat}`}
+                    className="group relative block aspect-[4/5] bg-foreground text-background overflow-hidden rounded-2xl"
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center text-7xl md:text-8xl opacity-90 group-hover:scale-110 transition-transform duration-500">
+                      {categoryIcons[cat] || "🍽️"}
+                    </div>
+                    <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                      <p className="font-stamp text-sm md:text-base tracking-wider">{cat}</p>
+                    </div>
+                    <div className="absolute inset-0 bg-primary opacity-0 group-hover:opacity-90 transition-opacity flex items-center justify-center">
+                      <span className="font-stamp text-primary-foreground text-sm tracking-widest inline-flex items-center gap-2">
+                        ORDER <ArrowRight className="h-4 w-4" />
+                      </span>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
             </div>
           </div>
         </section>
       )}
 
-      {/* Featured Items */}
+      {/* ───────────── FEATURED ───────────── */}
       {featuredItems && featuredItems.length > 0 && (
-        <section className="py-20 md:py-28 bg-gradient-to-b from-card/50 to-background border-y border-border/50">
+        <section className="bg-secondary py-20 md:py-28 relative overflow-hidden">
           <div className="container mx-auto px-4">
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0} className="text-center mb-14">
-              <span className="text-primary font-body font-semibold uppercase tracking-widest text-sm">Popular</span>
-              <h2 className="text-3xl md:text-5xl font-display font-bold text-foreground mt-2 mb-3">Featured Dishes</h2>
-              <p className="text-muted-foreground font-body max-w-md mx-auto">Our most loved creations, crafted to perfection</p>
-            </motion.div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div className="text-center mb-14">
+              <p className="font-stamp text-xs tracking-[0.3em] text-primary mb-3">— SIGNATURE</p>
+              <h2 className="font-mega text-5xl md:text-8xl text-foreground">
+                every layer<br /><span className="text-primary">packed</span> with flavor
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
               {featuredItems.map((item, i) => (
-                <motion.div key={item.id} custom={i} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
-                  className="card-glow relative rounded-2xl bg-card border border-border/50 overflow-hidden group"
+                <motion.div
+                  key={item.id}
+                  custom={i}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeUp}
+                  className="group bg-background rounded-3xl overflow-hidden border border-border hover:border-primary/40 hover:shadow-2xl hover:-translate-y-1 transition-all"
                 >
-                  <span className="absolute top-3 left-3 z-10 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-primary text-primary-foreground shadow-lg">
-                    <Flame className="h-3 w-3" /> Hot
-                  </span>
-                  {item.image_url ? (
-                    <div className="aspect-[4/3] overflow-hidden">
-                      <img src={item.image_url} alt={item.name} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                  <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                    {item.image_url ? (
+                      <img
+                        src={item.image_url}
+                        alt={item.name}
+                        loading="lazy"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <UtensilsCrossed className="h-14 w-14 text-muted-foreground" />
+                      </div>
+                    )}
+                    <span className="absolute top-3 left-3 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary text-primary-foreground font-stamp text-[10px] tracking-widest shadow-lg">
+                      <Flame className="h-3 w-3" /> HOT
+                    </span>
+                  </div>
+                  <div className="p-5 flex items-center justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="font-stamp text-[10px] tracking-widest text-primary">{item.category}</p>
+                      <h3 className="font-display text-xl text-foreground mt-1 truncate">{item.name}</h3>
+                      <p className="font-mega text-2xl text-foreground mt-1">₹{item.price.toFixed(0)}</p>
                     </div>
-                  ) : (
-                    <div className="aspect-[4/3] bg-gradient-to-br from-muted to-muted/50 flex items-center justify-center">
-                      <UtensilsCrossed className="h-12 w-12 text-muted-foreground" />
-                    </div>
-                  )}
-                  <div className="p-5">
-                    <span className="text-xs font-semibold text-primary uppercase tracking-wider font-body">{item.category}</span>
-                    <h3 className="font-display font-semibold text-lg text-foreground mt-1 group-hover:text-primary transition-colors">{item.name}</h3>
-                    <div className="flex items-center justify-between mt-3">
-                      <p className="text-2xl font-bold text-primary font-body">₹{item.price.toFixed(0)}</p>
-                      <Link to="/menu">
-                        <Button size="sm" className="rounded-full font-body shadow-md group-hover:shadow-primary/40 group-hover:shadow-lg transition-shadow">
-                          Order <ArrowRight className="h-3 w-3 ml-1" />
-                        </Button>
-                      </Link>
-                    </div>
+                    <Link to="/menu">
+                      <Button size="icon" className="rounded-full h-12 w-12 shrink-0">
+                        <ArrowRight className="h-5 w-5" />
+                      </Button>
+                    </Link>
                   </div>
                 </motion.div>
               ))}
-
             </div>
-            <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={3} className="text-center mt-12">
+
+            <div className="text-center mt-14">
               <Link to="/menu">
-                <Button size="lg" variant="outline" className="rounded-full px-10 font-body text-base hover:scale-105 transition-transform">
-                  See Full Menu <ArrowRight className="h-4 w-4 ml-2" />
+                <Button size="lg" variant="outline" className="rounded-full font-stamp tracking-widest text-xs h-12 px-8 border-2 border-foreground hover:bg-foreground hover:text-background">
+                  SEE FULL MENU <ArrowRight className="h-4 w-4 ml-2" />
                 </Button>
               </Link>
-            </motion.div>
+            </div>
           </div>
         </section>
       )}
 
-      {/* CTA Section */}
-      <section className="py-20 md:py-28">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp} custom={0}
-            className="relative rounded-3xl overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-primary via-primary/90 to-accent" />
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 20% 50%, white 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
-            <div className="relative px-8 py-16 md:px-16 md:py-24 text-center">
-              <motion.h2 custom={1} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
-                className="text-3xl md:text-5xl font-display font-bold text-primary-foreground mb-4"
-              >
-                Hungry? Order Now!
-              </motion.h2>
-              <motion.p custom={2} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}
-                className="text-primary-foreground/80 font-body text-lg max-w-lg mx-auto mb-8"
-              >
-                Skip the wait. Browse our menu and place your order directly via WhatsApp. Hot & fresh, delivered to your door.
-              </motion.p>
-              <motion.div custom={3} initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUp}>
-                <Link to="/menu">
-                  <Button size="lg" variant="secondary" className="text-lg px-10 py-6 rounded-full font-body shadow-2xl hover:scale-105 transition-transform">
-                    <UtensilsCrossed className="h-5 w-5 mr-2" /> Browse Menu
-                  </Button>
-                </Link>
-              </motion.div>
-            </div>
-          </motion.div>
+      {/* ───────────── BIG CTA ───────────── */}
+      <section className="bg-primary text-primary-foreground py-24 md:py-36 relative overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none">
+          <p className="font-mega text-[30vw] leading-none">FEEL IT</p>
+        </div>
+        <div className="relative container mx-auto px-4 text-center max-w-3xl">
+          <p className="font-stamp text-xs tracking-[0.3em] mb-4 opacity-80">— FEEL THE CRUNCH</p>
+          <h2 className="font-mega text-6xl md:text-9xl leading-[0.85] mb-6">
+            feel the<br />change
+          </h2>
+          <p className="font-body text-base md:text-lg opacity-90 mb-10 max-w-xl mx-auto">
+            Fried for the bold, built for the hungry. Dive into a legendary crispy experience —
+            every shattering edge and juicy bite rules.
+          </p>
+          <Link to="/menu">
+            <Button
+              size="lg"
+              variant="secondary"
+              className="rounded-full h-14 px-10 font-stamp tracking-widest text-sm bg-primary-foreground text-primary hover:bg-primary-foreground/90 shadow-2xl"
+            >
+              ORDER NOW <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </Link>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t bg-card/50">
-        <div className="container mx-auto px-4 py-12 md:py-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+      {/* ───────────── FOOTER ───────────── */}
+      <footer className="bg-foreground text-background">
+        <div className="container mx-auto px-4 py-16 md:py-20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Flame className="h-7 w-7 text-primary" />
-                <span className="text-xl font-display font-bold text-foreground">Fried&Crispy</span>
+                <span className="font-stamp text-lg tracking-wider">FRIED&amp;CRISPY</span>
               </div>
-              <p className="text-muted-foreground font-body text-sm leading-relaxed">
-                Crispy, bold & delicious — your favourite fast food destination in Gorakhpur.
+              <p className="font-body text-sm opacity-70 leading-relaxed max-w-xs">
+                Crispy, bold &amp; delicious — your favourite crispy chicken destination in Gorakhpur.
               </p>
             </div>
             <div>
-              <h4 className="font-display font-semibold text-foreground mb-4">Quick Links</h4>
+              <p className="font-stamp text-xs tracking-widest opacity-50 mb-4">— EXPLORE</p>
               <div className="space-y-2 font-body text-sm">
-                <Link to="/menu" className="block text-muted-foreground hover:text-primary transition-colors">Menu</Link>
-                <Link to="/admin" className="block text-muted-foreground hover:text-primary transition-colors">Admin Panel</Link>
+                <Link to="/menu" className="block hover:text-primary transition-colors">Menu</Link>
+                <Link to="/track" className="block hover:text-primary transition-colors">Track Order</Link>
+                <Link to="/admin" className="block hover:text-primary transition-colors">Admin Panel</Link>
               </div>
             </div>
             <div>
-              <h4 className="font-display font-semibold text-foreground mb-4">Contact</h4>
-              <div className="space-y-3 font-body text-sm text-muted-foreground">
-                <p className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary flex-shrink-0" /> Koni Jagdishpur Bypass, Gorakhpur</p>
-                <a href="tel:+918005040580" className="flex items-center gap-2 hover:text-primary transition-colors"><Phone className="h-4 w-4 text-primary flex-shrink-0" /> 8005040580</a>
-                <a href="mailto:info@friedandcrispy.com" className="flex items-center gap-2 hover:text-primary transition-colors"><Mail className="h-4 w-4 text-primary flex-shrink-0" /> info@friedandcrispy.com</a>
+              <p className="font-stamp text-xs tracking-widest opacity-50 mb-4">— CONTACT</p>
+              <div className="space-y-3 font-body text-sm opacity-90">
+                <p className="flex items-start gap-2"><MapPin className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" /> Koni Jagdishpur Bypass, Gorakhpur</p>
+                <a href="tel:+918005040580" className="flex items-center gap-2 hover:text-primary"><Phone className="h-4 w-4 text-primary flex-shrink-0" /> 8005040580</a>
+                <a href="mailto:info@friedandcrispy.com" className="flex items-center gap-2 hover:text-primary"><Mail className="h-4 w-4 text-primary flex-shrink-0" /> info@friedandcrispy.com</a>
               </div>
             </div>
           </div>
-          <div className="border-t mt-10 pt-6 text-center">
-            <p className="text-xs text-muted-foreground font-body">© {new Date().getFullYear()} Fried&Crispy. All rights reserved.</p>
+
+          {/* Massive footer wordmark */}
+          <div className="border-t border-background/20 pt-10">
+            <p className="font-mega text-[22vw] md:text-[16vw] leading-[0.8] text-center opacity-95">
+              FRIED&amp;CRISPY
+            </p>
           </div>
+          <p className="text-center font-stamp text-[10px] tracking-widest opacity-50 mt-6">
+            © {new Date().getFullYear()} — ALL RIGHTS RESERVED
+          </p>
         </div>
       </footer>
     </div>
