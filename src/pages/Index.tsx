@@ -63,6 +63,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden text-foreground">
+      <MouseTrail />
       {/* ───────────── NAV ───────────── */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-primary text-primary-foreground border-b border-primary-foreground/10">
         <div className="container mx-auto flex items-center justify-between h-14 px-4">
