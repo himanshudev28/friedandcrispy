@@ -133,7 +133,7 @@ npm run build
 
 **Himanshu Singh**
 
-- GitHub: https://github.com/himanshudev28
+- GitHub: https://github.com/DarkDevil-x
 
 ---
 
