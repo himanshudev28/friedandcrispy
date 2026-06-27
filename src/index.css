@@ -144,6 +144,36 @@
   .animate-marquee {
     animation: marquee 28s linear infinite;
   }
+
+  /* Mega display type — CRAV-inspired oversized headlines */
+  .font-mega {
+    font-family: "Anton", "Archivo Black", sans-serif;
+    letter-spacing: -0.02em;
+    line-height: 0.85;
+    text-transform: uppercase;
+  }
+  .font-stamp {
+    font-family: "Archivo Black", sans-serif;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  /* Slow ticker for hero badges */
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .animate-ticker { animation: ticker 40s linear infinite; }
+
+  /* Text outline (for huge background lettering) */
+  .text-outline {
+    -webkit-text-stroke: 2px hsl(var(--primary-foreground) / 0.85);
+    color: transparent;
+  }
+  .text-outline-dark {
+    -webkit-text-stroke: 2px hsl(var(--foreground) / 0.85);
+    color: transparent;
+  }
 }
 
 
