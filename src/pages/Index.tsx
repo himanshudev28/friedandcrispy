@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import ThemeToggle from "@/components/ThemeToggle";
+import MouseTrail from "@/components/MouseTrail";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { MenuItem } from "@/types/menu";
